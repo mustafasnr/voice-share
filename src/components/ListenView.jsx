@@ -37,10 +37,10 @@ export function ListenView() {
   );
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-500">
+    <div className="space-y-6 sm:space-y-8 w-full max-w-5xl mx-auto">
 
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Yayınları Dinle</h2>
@@ -56,7 +56,7 @@ export function ListenView() {
             <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Yayın ara..."
-              className="pl-9 h-11 w-[220px] bg-card/60"
+              className="pl-9 h-11 w-full sm:w-[220px] bg-card/60"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -75,23 +75,23 @@ export function ListenView() {
       </div>
 
       {/* OUTPUT DEVICE CARD */}
-      <Card className="border-border/40 bg-card/60 backdrop-blur p-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <Card className="border-border/40 bg-card/60 backdrop-blur-md p-5 sm:p-6 overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
 
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-primary/10">
-              <Volume2 className="w-5 h-5 text-primary" />
+            <div className="p-3 rounded-xl bg-primary/10 text-primary">
+              <Volume2 className="w-5 h-5" />
             </div>
 
             <div>
-              <p className="text-sm font-semibold">Çıkış Cihazı</p>
+              <p className="text-sm font-bold tracking-tight">Çıkış Cihazı</p>
               <p className="text-xs text-muted-foreground">
                 Sesin çalınacağı hoparlörü seç
               </p>
             </div>
           </div>
 
-          <div className="w-1/2">
+          <div className="w-full sm:w-1/2 lg:w-1/3">
             <DevicePicker
               devices={outputDevices}
               selected={selectedOutput}
@@ -141,9 +141,8 @@ export function ListenView() {
               >
                 <CardContent className="p-6 space-y-5">
 
-                  {/* Header */}
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-secondary flex items-center justify-center text-primary font-bold text-lg">
+                    <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary/20 to-secondary flex items-center justify-center text-primary font-bold text-lg shadow-inner">
                       {peer.user_name?.charAt(0).toUpperCase() || "U"}
                     </div>
 
@@ -168,9 +167,12 @@ export function ListenView() {
                     </div>
                   </div>
 
-                  {/* Device Info */}
                   <div className="flex items-center gap-2 text-xs text-muted-foreground bg-secondary/30 p-2 rounded-md">
-                    <Mic className="w-3.5 h-3.5" />
+                    {peer.is_output ? (
+                      <Volume2 className="w-3.5 h-3.5 text-blue-400" />
+                    ) : (
+                      <Mic className="w-3.5 h-3.5 text-green-400" />
+                    )}
                     <span className="truncate">{peer.device_name}</span>
                   </div>
 

@@ -5,6 +5,7 @@ pub struct StreamInfo {
     pub user_id: String,
     pub user_name: String,
     pub device_name: String,
+    pub is_output: bool,
     pub multicast_ip: String,
     pub port: u16,
     pub is_streaming: bool,
@@ -30,5 +31,5 @@ pub struct AudioPacket {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AudioDevice {
     pub name: String,
-    pub is_loopback: bool,
+    pub is_output: bool,
 }

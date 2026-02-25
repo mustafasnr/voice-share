@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
 
 export const useStore = create((set, get) => ({
   activeTab: 'broadcast', // 'broadcast' | 'listen' | 'settings'
@@ -11,6 +12,7 @@ export const useStore = create((set, get) => ({
   selectedOutput: null,
   peers: [],
   isStreaming: false,
+  audioLevel: 0,
   listeningTo: [], // user_ids of peers being listened to
 
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -29,6 +31,12 @@ export const useStore = create((set, get) => ({
       localStorage.setItem('userId', id);
     }
     set({ userId: id });
+
+    // Setup listeners
+    listen('audio-level', (event) => {
+      set({ audioLevel: event.payload });
+    });
+
     return id;
   },
 

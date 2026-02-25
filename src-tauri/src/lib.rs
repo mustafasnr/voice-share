@@ -1,3 +1,4 @@
+use tauri::Emitter;
 mod models;
 mod audio;
 mod network;
@@ -47,6 +48,7 @@ fn init_discovery(state: tauri::State<AppState>, user_id: String) -> Result<(), 
 
 #[tauri::command]
 fn start_broadcast(
+    window: tauri::Window,
     state: tauri::State<AppState>,
     device_name: String,
     user_id: String,
@@ -57,12 +59,38 @@ fn start_broadcast(
     let sender = Arc::new(sender);
 
     let mut capture = CaptureEngine::new().map_err(|e| e.to_string())?;
+    
+    // We'll use this to throttle events to the frontend (e.g. every 5th packet)
+    let mut packet_count = 0;
+    
     capture.start_capture(device_name.clone(), move |packet| {
         let _ = sender.send(&packet);
+        
+        // Calculate peak amplitude for visualization
+        packet_count += 1;
+        if packet_count % 4 == 0 { // Send update every ~40-60ms
+            let mut max_val: f32 = 0.0;
+            for chunk in packet.data.chunks_exact(2) {
+                let sample = i16::from_le_bytes([chunk[0], chunk[1]]) as f32 / 32768.0;
+                let abs_sample = sample.abs();
+                if abs_sample > max_val {
+                    max_val = abs_sample;
+                }
+            }
+            // Emit peak level to UI (0.0 to 1.0)
+            let _ = window.emit("audio-level", max_val);
+        }
     }).map_err(|e| e.to_string())?;
 
     let mut lock = state.capture.lock().unwrap();
     *lock = Some(capture);
+
+    // Determine if the source is an output (monitor) or input (mic)
+    let devices = audio::get_all_capture_devices().unwrap_or_default();
+    let is_output = devices.iter()
+        .find(|d| d.name == device_name)
+        .map(|d| d.is_output)
+        .unwrap_or(false);
 
     // Announce to discovery and start heartbeat
     let disc_opt = state.discovery.lock().unwrap().clone();
@@ -71,6 +99,7 @@ fn start_broadcast(
             user_id: user_id.clone(),
             user_name,
             device_name,
+            is_output,
             multicast_ip: ip,
             port,
             is_streaming: true,

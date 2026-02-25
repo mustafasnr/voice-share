@@ -26,18 +26,20 @@ function App() {
   }, []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto px-8 py-8 max-w-6xl">
-          {activeTab === 'broadcast' && <BroadcastView />}
-          {activeTab === 'listen' && <ListenView />}
-          {activeTab === 'settings' && (
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-              <p>Ayarlar sayfası yakında eklenecek.</p>
-            </div>
-          )}
+      <main className="flex-1 overflow-y-auto relative bg-background/95">
+        <div className="mx-auto w-full max-w-6xl min-h-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {activeTab === 'broadcast' && <BroadcastView />}
+            {activeTab === 'listen' && <ListenView />}
+            {activeTab === 'settings' && (
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <p>Ayarlar sayfası yakında eklenecek.</p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>

@@ -2,28 +2,19 @@ import React from 'react';
 import { useStore } from '../store/useStore';
 import {
   Radio,
-  Mic,
-  Volume2,
   Activity,
   Power,
   User,
-  Shield,
-  Wifi
 } from 'lucide-react';
 
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
+import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from './ui/select';
+
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
 import DevicePicker from './device-picker';
+import { AudioVisualizer } from './AudioVisualizer';
 
 export function BroadcastView() {
   const {
@@ -45,7 +36,7 @@ export function BroadcastView() {
   const selectedDevice = inputDevices.find(d => d.name === selectedInput);
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in duration-500">
+    <div className="space-y-6 sm:space-y-8 w-full max-w-5xl mx-auto">
 
       {/* HEADER */}
       <div className="flex items-center justify-between">
@@ -89,11 +80,11 @@ export function BroadcastView() {
 
 
 
-            <div className="flex items-end gap-4 w-full">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-4 w-full">
 
               {/* DEVICE SELECT */}
-              <div className="flex flex-col gap-2 flex-1">
-                <label className="text-xs text-muted-foreground">
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
+                <label className="text-xs text-muted-foreground font-medium ml-1">
                   Ses Kaynağı
                 </label>
 
@@ -108,16 +99,16 @@ export function BroadcastView() {
               <Button
                 disabled={!selectedInput}
                 onClick={handleToggleBroadcast}
-                className={`h-[56px] px-6 text-base font-semibold whitespace-nowrap transition-all
+                className={`h-[56px] px-8 text-base font-bold whitespace-nowrap transition-all shadow-lg
       ${isStreaming
-                    ? "bg-destructive hover:bg-destructive/90"
-                    : "bg-primary"
+                    ? "bg-destructive hover:bg-destructive/90 shadow-destructive/20"
+                    : "bg-primary hover:bg-primary/90 shadow-primary/20"
                   }`}
               >
                 {isStreaming ? (
                   <>
                     <Power className="w-5 h-5 mr-2" />
-                    Yayını Durdur
+                    Durdur
                   </>
                 ) : (
                   <>
@@ -132,15 +123,25 @@ export function BroadcastView() {
 
 
 
-            {/* AUDIO LEVEL */}
-            {isStreaming && (
-              <div className="space-y-2">
-                <div className="text-[10px] font-bold text-primary animate-pulse uppercase">
-                  Ses Seviyesi
+            {/* AUDIO VISUALIZER / STEAM STYLE GRAPH */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <div className="text-[10px] font-bold text-primary uppercase tracking-widest">
+                  Aktif Yayın Sinyali
                 </div>
-                <Progress value={65} className="h-2" />
+                {isStreaming && (
+                  <div className="flex items-center gap-1">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    <span className="text-[9px] font-bold text-primary/80">YAYINLANIYOR</span>
+                  </div>
+                )}
               </div>
-            )}
+
+              <AudioVisualizer />
+            </div>
 
           </CardContent>
         </Card>

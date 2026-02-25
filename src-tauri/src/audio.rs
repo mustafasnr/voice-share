@@ -189,12 +189,12 @@ pub fn get_all_capture_devices() -> Result<Vec<AudioDevice>> {
     if let Ok(input_devices) = host.input_devices() {
         for device in input_devices {
             if let Ok(name) = device.name() {
-                let is_loopback = name.to_lowercase().contains("loopback") || 
+                let is_output = name.to_lowercase().contains("loopback") || 
                                   name.to_lowercase().contains("stereo mix");
                 
                 result.push(AudioDevice {
                     name,
-                    is_loopback,
+                    is_output,
                 });
             }
         }
@@ -209,7 +209,7 @@ pub fn get_all_capture_devices() -> Result<Vec<AudioDevice>> {
 
                 result.push(AudioDevice {
                     name,
-                    is_loopback: true, // Output devices are loopback sources for capture
+                    is_output: true, // Output devices are speakers/headphones
                 });
             }
         }
@@ -227,7 +227,7 @@ pub fn get_output_devices() -> Result<Vec<AudioDevice>> {
         if let Ok(name) = device.name() {
             result.push(AudioDevice {
                 name,
-                is_loopback: false,
+                is_output: true, // Output devices are speakers/headphones
             });
         }
     }
