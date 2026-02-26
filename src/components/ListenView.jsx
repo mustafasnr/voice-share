@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { useStore } from "../store/useStore";
-import {
-  Volume2,
-  Users,
-  Search,
-  RefreshCw,
-} from "lucide-react";
+import { Volume2, Users, Search, RefreshCw } from "lucide-react";
+import { cn } from "../lib/utils";
 
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
@@ -34,52 +30,51 @@ export function ListenView() {
   );
 
   return (
-    <div className="space-y-6 sm:space-y-10 w-full max-w-7xl mx-auto pb-10">
+    <div className="space-y-5 w-full pb-6">
 
-      {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1">
-          <h2 className="text-3xl font-bold tracking-tight">Yayınları Dinle</h2>
-          <p className="text-muted-foreground text-sm">
+      {/* HEADER */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-0.5">
+          <h2 className="text-xl font-bold tracking-tight truncate">Yayınları Dinle</h2>
+          <p className="text-muted-foreground text-xs truncate">
             Yerel ağdaki aktif yayıncıları keşfet
           </p>
         </div>
-
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Yayıncı veya ID ara..."
-              className="pl-9 h-10 bg-card/40"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 shrink-0"
-            onClick={refreshPeers}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-9 w-9 shrink-0"
+          onClick={refreshPeers}
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
       </div>
 
-      {/* OUTPUT CONFIG CARD */}
-      <Card className="border-border/40 bg-card/40 py-0 backdrop-blur-md overflow-hidden border-0 sm:border">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-2.5 sm:p-3 rounded-2xl bg-primary/10 text-primary border border-primary/20">
-              <Volume2 className="w-5 h-5" />
+      {/* SEARCH */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Yayıncı veya ID ara..."
+          className="pl-9 h-9 bg-card/40"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {/* OUTPUT DEVICE CARD */}
+      <Card className="border-border/40 bg-card/40 backdrop-blur-md overflow-hidden py-0">
+        <div className="flex items-center justify-between p-3 gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
+              <Volume2 className="w-4 h-4" />
             </div>
-            <div>
-              <p className="text-sm font-bold">Çıkış Cihazı</p>
-              <p className="text-xs text-muted-foreground">Hoparlör seçin</p>
+            <div className="min-w-0">
+              <p className="text-sm font-bold truncate">Çıkış Cihazı</p>
+              <p className="text-xs text-muted-foreground truncate">Hoparlör seçin</p>
             </div>
           </div>
 
-          <div className="w-full sm:w-1/2 md:w-1/3">
+          <div className="w-48 shrink-0">
             <DevicePicker
               devices={outputDevices}
               selected={selectedOutput}
@@ -89,15 +84,15 @@ export function ListenView() {
         </div>
       </Card>
 
-      {/* PEERS GRID */}
-      <div className="grid grid-cols-1 sm:gap-6 px-1 sm:px-0">
+      {/* PEERS LIST */}
+      <div className="space-y-3">
         {filteredPeers.length === 0 ? (
-          <div className="col-span-full py-20 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-border/40 rounded-xl bg-card/20 backdrop-blur-sm px-6">
-            <div className="w-20 h-20 rounded-full bg-secondary/50 flex items-center justify-center border border-border/40">
-              <Users className="w-10 h-10 text-muted-foreground/50" />
+          <div className="py-16 flex flex-col items-center justify-center text-center space-y-4 border-2 border-dashed border-border/40 rounded-xl bg-card/20 backdrop-blur-sm px-6">
+            <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center border border-border/40 shrink-0">
+              <Users className="w-8 h-8 text-muted-foreground/50" />
             </div>
-            <div className="max-w-xs">
-              <h3 className="text-lg font-bold">Aktif Yayın Bulunamadı</h3>
+            <div className="max-w-xs min-w-0">
+              <h3 className="text-base font-bold">Aktif Yayın Bulunamadı</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Şu an ağda kimse yayın yapmıyor.
               </p>

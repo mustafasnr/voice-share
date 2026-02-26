@@ -3,7 +3,6 @@ import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 
 export const useStore = create((set, get) => ({
-  activeTab: 'broadcast', // 'broadcast' | 'listen' | 'settings'
   userName: localStorage.getItem('userName') || '',
   userId: localStorage.getItem('userId') || '',
   inputDevices: [],
@@ -18,7 +17,6 @@ export const useStore = create((set, get) => ({
   peerLevels: {}, // { user_id: 0.0 }
   locale: localStorage.getItem('locale') || (navigator.language.split(/[-_]/)[0] === 'tr' ? 'tr' : 'en'),
 
-  setActiveTab: (tab) => set({ activeTab: tab }),
   setLocale: (locale) => {
     localStorage.setItem('locale', locale);
     set({ locale });
