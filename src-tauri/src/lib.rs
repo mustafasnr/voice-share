@@ -40,9 +40,9 @@ fn get_peers(state: tauri::State<AppState>) -> Result<Vec<StreamInfo>, String> {
 }
 
 #[tauri::command]
-fn init_discovery(state: tauri::State<AppState>, user_id: String) -> Result<(), String> {
+fn init_discovery(state: tauri::State<AppState>) -> Result<(), String> {
     let mut disc = state.discovery.lock().unwrap();
-    *disc = Some(DiscoveryService::new(user_id).map_err(|e| e.to_string())?);
+    *disc = Some(DiscoveryService::new().map_err(|e| e.to_string())?);
     Ok(())
 }
 
@@ -60,26 +60,12 @@ fn start_broadcast(
 
     let mut capture = CaptureEngine::new().map_err(|e| e.to_string())?;
     
-    // We'll use this to throttle events to the frontend (e.g. every 5th packet)
-    let mut packet_count = 0;
-    
-    capture.start_capture(device_name.clone(), move |packet| {
+    // Start capture and send encoded packets
+    let (actual_rate, actual_channels) = capture.start_capture(device_name.clone(), move |packet| {
         let _ = sender.send(&packet);
         
-        // Calculate peak amplitude for visualization
-        packet_count += 1;
-        if packet_count % 4 == 0 { // Send update every ~40-60ms
-            let mut max_val: f32 = 0.0;
-            for chunk in packet.data.chunks_exact(2) {
-                let sample = i16::from_le_bytes([chunk[0], chunk[1]]) as f32 / 32768.0;
-                let abs_sample = sample.abs();
-                if abs_sample > max_val {
-                    max_val = abs_sample;
-                }
-            }
-            // Emit peak level to UI (0.0 to 1.0)
-            let _ = window.emit("audio-level", max_val);
-        }
+        // Emit peak level to UI (already calculated in audio.rs)
+        let _ = window.emit("audio-level", packet.peak_level);
     }).map_err(|e| e.to_string())?;
 
     let mut lock = state.capture.lock().unwrap();
@@ -92,28 +78,30 @@ fn start_broadcast(
         .map(|d| d.is_output)
         .unwrap_or(false);
 
+    let info = StreamInfo {
+        user_id: user_id.clone(),
+        user_name,
+        device_name,
+        is_output,
+        multicast_ip: ip,
+        port,
+        is_streaming: true,
+        sample_rate: actual_rate,
+        channels: actual_channels,
+        bitrate: 128000, // Higher bitrate for potential stereo
+    };
+
     // Announce to discovery and start heartbeat
     let disc_opt = state.discovery.lock().unwrap().clone();
     if let Some(d) = disc_opt {
-        let _ = d.broadcast_announce(StreamInfo {
-            user_id: user_id.clone(),
-            user_name,
-            device_name,
-            is_output,
-            multicast_ip: ip,
-            port,
-            is_streaming: true,
-            sample_rate: 44100,
-            channels: 2,
-            bitrate: 0,
-        });
+        let _ = d.broadcast_announce(info.clone());
 
         // Heartbeat thread
         state.is_streaming.store(true, Ordering::SeqCst);
         let is_streaming = state.is_streaming.clone();
         std::thread::spawn(move || {
             while is_streaming.load(Ordering::SeqCst) {
-                let _ = d.broadcast_heartbeat();
+                let _ = d.broadcast_heartbeat(info.clone());
                 std::thread::sleep(std::time::Duration::from_secs(2));
             }
         });
@@ -123,7 +111,7 @@ fn start_broadcast(
 }
 
 #[tauri::command]
-fn stop_broadcast(state: tauri::State<AppState>) -> Result<(), String> {
+fn stop_broadcast(state: tauri::State<AppState>, user_id: String) -> Result<(), String> {
     let mut lock = state.capture.lock().unwrap();
     if let Some(mut capture) = lock.take() {
         capture.stop();
@@ -134,7 +122,7 @@ fn stop_broadcast(state: tauri::State<AppState>) -> Result<(), String> {
     // Notify discovery
     let disc = state.discovery.lock().unwrap();
     if let Some(d) = &*disc {
-        let _ = d.broadcast_goodbye();
+        let _ = d.broadcast_goodbye(user_id);
     }
     Ok(())
 }
@@ -146,9 +134,13 @@ fn start_listen(
     multicast_ip: String,
     port: u16,
     device_name: String,
+    sample_rate: u32,
+    channels: u8,
+    volume: f32,
 ) -> Result<(), String> {
-    let mut playback = PlaybackEngine::new(44100, 2).map_err(|e| e.to_string())?;
-    playback.start_playback(device_name, 44100, 2).map_err(|e| e.to_string())?;
+    let mut playback = PlaybackEngine::new(sample_rate, channels).map_err(|e| e.to_string())?;
+    playback.set_volume(volume);
+    playback.start_playback(device_name).map_err(|e| e.to_string())?;
 
     let receiver = AudioReceiver::new(&multicast_ip, port).map_err(|e| e.to_string())?;
     let playback_arc = Arc::new(Mutex::new(playback));
@@ -185,6 +177,17 @@ fn stop_listen(state: tauri::State<AppState>, user_id: String) -> Result<(), Str
     Ok(())
 }
 
+#[tauri::command]
+fn set_peer_volume(state: tauri::State<AppState>, user_id: String, volume: f32) -> Result<(), String> {
+    let playbacks = state.playbacks.lock().unwrap();
+    if let Some(playback_arc) = playbacks.get(&user_id) {
+        if let Ok(playback) = playback_arc.lock() {
+            playback.set_volume(volume);
+        }
+    }
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -203,7 +206,8 @@ pub fn run() {
             start_broadcast,
             stop_broadcast,
             start_listen,
-            stop_listen
+            stop_listen,
+            set_peer_volume
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

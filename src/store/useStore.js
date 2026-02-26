@@ -14,10 +14,22 @@ export const useStore = create((set, get) => ({
   isStreaming: false,
   audioLevel: 0,
   listeningTo: [], // user_ids of peers being listened to
+  peerVolumes: {}, // { user_id: 1.0 }
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedInput: (id) => set({ selectedInput: id }),
   setSelectedOutput: (id) => set({ selectedOutput: id }),
+
+  setPeerVolume: async (userId, volume) => {
+    try {
+      await invoke('set_peer_volume', { userId, volume });
+      set((state) => ({
+        peerVolumes: { ...state.peerVolumes, [userId]: volume }
+      }));
+    } catch (err) {
+      console.error('Failed to set peer volume:', err);
+    }
+  },
 
   setUserName: (name) => {
     localStorage.setItem('userName', name);
@@ -60,9 +72,8 @@ export const useStore = create((set, get) => ({
   },
 
   startDiscovery: async () => {
-    const { userId } = get();
     try {
-      await invoke('init_discovery', { userId });
+      await invoke('init_discovery');
     } catch (err) {
       console.error('Failed to init discovery:', err);
     }
@@ -79,8 +90,9 @@ export const useStore = create((set, get) => ({
   },
 
   stopBroadcast: async () => {
+    const { userId } = get();
     try {
-      await invoke('stop_broadcast');
+      await invoke('stop_broadcast', { userId });
       set({ isStreaming: false });
     } catch (err) {
       console.error('Failed to stop broadcast:', err);
@@ -96,11 +108,15 @@ export const useStore = create((set, get) => ({
         await invoke('stop_listen', { userId: peer.user_id });
         set({ listeningTo: listeningTo.filter(id => id !== peer.user_id) });
       } else {
+        const volume = get().peerVolumes[peer.user_id] ?? 1.0;
         await invoke('start_listen', {
           userId: peer.user_id,
           multicastIp: peer.multicast_ip,
           port: peer.port,
-          deviceName: outputDevice
+          deviceName: outputDevice,
+          sampleRate: peer.sample_rate,
+          channels: peer.channels,
+          volume
         });
         set({ listeningTo: [...listeningTo, peer.user_id] });
       }

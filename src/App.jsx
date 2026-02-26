@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useStore } from './store/useStore';
-import { Sidebar } from './components/Sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from './components/ui/sidebar';
+import { AppSidebar } from './components/AppSidebar';
 import { BroadcastView } from './components/BroadcastView';
 import { ListenView } from './components/ListenView';
+import { SettingsView } from './components/SettingsView';
 
 function App() {
   const {
@@ -26,23 +28,38 @@ function App() {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar />
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background dark">
+        <AppSidebar />
+        <SidebarInset className="flex w-full flex-col overflow-hidden">
+          {/* HEADER FOR MOBILE & STICKY TRIGGER */}
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/40 px-4 sm:px-6 sticky top-0 bg-background/80 backdrop-blur-md z-30">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <div className="h-4 w-px bg-border/40 mx-2 hidden sm:block" />
+              <h1 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                {activeTab === 'broadcast' && "Yayın Kontrolü"}
+                {activeTab === 'listen' && "Yayınları Keşfet"}
+                {activeTab === 'settings' && "Uygulama Ayarları"}
+              </h1>
+            </div>
 
-      <main className="flex-1 overflow-y-auto relative bg-background/95">
-        <div className="mx-auto w-full max-w-6xl min-h-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {activeTab === 'broadcast' && <BroadcastView />}
-            {activeTab === 'listen' && <ListenView />}
-            {activeTab === 'settings' && (
-              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                <p>Ayarlar sayfası yakında eklenecek.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
+            <div className="flex items-center gap-4">
+              {/* Optional: Add status badges or user info here */}
+            </div>
+          </header>
+
+          {/* MAIN CONTENT AREA */}
+          <main className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6">
+            <div className="mx-auto w-full max-w-7xl animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {activeTab === 'broadcast' && <BroadcastView />}
+              {activeTab === 'listen' && <ListenView />}
+              {activeTab === 'settings' && <SettingsView />}
+            </div>
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
 

@@ -86,11 +86,10 @@ impl AudioReceiver {
 pub struct DiscoveryService {
     socket: Arc<UdpSocket>,
     peers: Arc<Mutex<Vec<(StreamInfo, Instant)>>>,
-    user_id: String,
 }
 
 impl DiscoveryService {
-    pub fn new(user_id: String) -> Result<Self> {
+    pub fn new() -> Result<Self> {
         let socket = Socket::new(Domain::IPV4, Type::DGRAM, Some(Protocol::UDP))?;
         socket.set_reuse_address(true)?;
         #[cfg(not(windows))]
@@ -104,7 +103,6 @@ impl DiscoveryService {
         Ok(Self {
             socket: Arc::new(socket.into()),
             peers: Arc::new(Mutex::new(Vec::new())),
-            user_id,
         })
     }
 
@@ -116,16 +114,16 @@ impl DiscoveryService {
         Ok(())
     }
 
-    pub fn broadcast_heartbeat(&self) -> Result<()> {
-        let msg = MessageType::Heartbeat(self.user_id.clone());
+    pub fn broadcast_heartbeat(&self, info: StreamInfo) -> Result<()> {
+        let msg = MessageType::Heartbeat(info);
         let data = bincode::serialize(&msg)?;
         let addr: SocketAddr = "255.255.255.255:11111".parse()?;
         self.socket.send_to(&data, addr)?;
         Ok(())
     }
 
-    pub fn broadcast_goodbye(&self) -> Result<()> {
-        let msg = MessageType::Goodbye(self.user_id.clone());
+    pub fn broadcast_goodbye(&self, user_id: String) -> Result<()> {
+        let msg = MessageType::Goodbye(user_id);
         let data = bincode::serialize(&msg)?;
         let addr: SocketAddr = "255.255.255.255:11111".parse()?;
         self.socket.send_to(&data, addr)?;
@@ -138,16 +136,11 @@ impl DiscoveryService {
             if let Ok(msg) = bincode::deserialize::<MessageType>(&buf[..n]) {
                 let mut peers = self.peers.lock().unwrap();
                 match msg {
-                    MessageType::Announce(info) => {
+                    MessageType::Announce(info) | MessageType::Heartbeat(info) => {
                         if let Some(p) = peers.iter_mut().find(|(i, _)| i.user_id == info.user_id) {
                             *p = (info, Instant::now());
                         } else {
                             peers.push((info, Instant::now()));
-                        }
-                    }
-                    MessageType::Heartbeat(uid) => {
-                        if let Some(p) = peers.iter_mut().find(|(i, _)| i.user_id == uid) {
-                            p.1 = Instant::now();
                         }
                     }
                     MessageType::Goodbye(uid) => {
@@ -157,7 +150,7 @@ impl DiscoveryService {
             }
         }
 
-        // Timeout check (6 saniye)
+        // Timeout check (6 seconds)
         let mut peers = self.peers.lock().unwrap();
         peers.retain(|(_, last_seen)| last_seen.elapsed() < Duration::from_secs(6));
         

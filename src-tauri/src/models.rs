@@ -17,7 +17,7 @@ pub struct StreamInfo {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum MessageType {
     Announce(StreamInfo),
-    Heartbeat(String), // user_id
+    Heartbeat(StreamInfo),
     Goodbye(String),   // user_id
 }
 
@@ -25,6 +25,7 @@ pub enum MessageType {
 pub struct AudioPacket {
     pub sequence: u16,
     pub timestamp: u64,
+    pub peak_level: f32,
     pub data: Vec<u8>,
 }
 
