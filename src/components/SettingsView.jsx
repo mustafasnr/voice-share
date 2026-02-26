@@ -10,6 +10,7 @@ import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { LanguageSelector } from "./LanguageSelector";
 import { ThemeSelector } from "./ThemeSelector";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 export function SettingsView() {
   const { userName, setUserName, userId } = useStore();
@@ -152,7 +153,7 @@ export function SettingsView() {
             ))}
 
             <div className="pt-2 flex flex-wrap gap-3">
-              <Button variant="outline" size="sm" className="gap-2 text-xs h-8">
+              <Button variant="outline" size="sm" className="gap-2 text-xs h-8" onClick={() => openUrl("https://github.com/mustafasnr/voice-share")}>
                 <Github className="w-3.5 h-3.5" />
                 <FormattedMessage id="settings.about.github" />
               </Button>
