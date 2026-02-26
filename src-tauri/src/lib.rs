@@ -1,4 +1,5 @@
 use tauri::Emitter;
+use serde::Serialize;
 mod models;
 mod audio;
 mod network;
@@ -55,6 +56,7 @@ fn start_broadcast(
     user_name: String,
 ) -> Result<(), String> {
     let (ip, port) = generate_multicast_addr(&user_id);
+    println!("Yayın başladı: http://{}:{}", ip, port);
     let sender = AudioSender::new(&ip, port).map_err(|e| e.to_string())?;
     let sender = Arc::new(sender);
 
@@ -102,7 +104,7 @@ fn start_broadcast(
         std::thread::spawn(move || {
             while is_streaming.load(Ordering::SeqCst) {
                 let _ = d.broadcast_heartbeat(info.clone());
-                std::thread::sleep(std::time::Duration::from_secs(2));
+                std::thread::sleep(std::time::Duration::from_secs(3));
             }
         });
     }
@@ -127,8 +129,15 @@ fn stop_broadcast(state: tauri::State<AppState>, user_id: String) -> Result<(), 
     Ok(())
 }
 
+#[derive(Serialize, Clone)]
+struct PeerAudioLevel {
+    user_id: String,
+    level: f32,
+}
+
 #[tauri::command]
 fn start_listen(
+    window: tauri::Window,
     state: tauri::State<AppState>,
     user_id: String,
     multicast_ip: String,
@@ -145,12 +154,17 @@ fn start_listen(
     let receiver = AudioReceiver::new(&multicast_ip, port).map_err(|e| e.to_string())?;
     let playback_arc = Arc::new(Mutex::new(playback));
     let playback_clone = playback_arc.clone();
+    let user_id_clone = user_id.clone();
 
     // Background thread for receiving audio
     std::thread::spawn(move || {
         while let Ok(packets) = receiver.receive() {
             if let Ok(p_lock) = playback_clone.lock() {
                 for p in packets {
+                    let _ = window.emit("peer-audio-level", PeerAudioLevel {
+                        user_id: user_id_clone.clone(),
+                        level: p.peak_level,
+                    });
                     let _ = p_lock.push_packet(p);
                 }
             } else {

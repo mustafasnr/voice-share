@@ -1,97 +1,143 @@
 import React, { useRef, useEffect } from 'react';
-import { useStore } from '../store/useStore';
 
-export function AudioVisualizer() {
+/**
+ * Highly optimized and stylish Audio Visualizer
+ * @param {number} level - Current audio peak level (0.0 to 1.0)
+ * @param {boolean} isStreaming - Whether audio is active
+ * @param {string} color - Primary color for the waveform
+ * @param {number} barCount - Number of bars to render (higher = more detailed)
+ * @param {'bars' | 'wave' | 'compact'} mode - Visualization style
+ */
+export function AudioVisualizer({
+  level = 0,
+  isStreaming = false,
+  color = '#60a5fa',
+  barCount = 40,
+  mode = 'bars'
+}) {
   const canvasRef = useRef(null);
-  const audioLevel = useStore(state => state.audioLevel);
-  const isStreaming = useStore(state => state.isStreaming);
-
-  // History of levels (last 60 frames)
-  const historyRef = useRef(new Array(60).fill(0));
-
-  // Use a ref to capture the latest level without triggering re-renders
+  const historyRef = useRef(new Array(barCount).fill(0));
+  const requestRef = useRef();
   const lastLevelRef = useRef(0);
+
+  // Sync level to ref to avoid re-renders while keeping the animation loop alive
   useEffect(() => {
-    lastLevelRef.current = audioLevel;
-  }, [audioLevel]);
+    lastLevelRef.current = level;
+  }, [level]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    const ctx = canvas.getContext('2d', { alpha: true });
 
-    let animationId;
-    let lastFrameTime = 0;
-    const frameInterval = 1000 / 24; // ~24 FPS (41.6ms per frame)
+    // Set internal resolution higher for Retina displays
+    const dpr = window.devicePixelRatio || 1;
+    let rect = canvas.getBoundingClientRect();
 
-    const render = (timestamp) => {
-      animationId = requestAnimationFrame(render);
+    const setSize = () => {
+      if (!canvas) return;
+      rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    };
 
-      // Frame rate limiting: only update if enough time has passed
-      const elapsed = timestamp - lastFrameTime;
-      if (elapsed < frameInterval) return;
+    setSize();
 
-      lastFrameTime = timestamp - (elapsed % frameInterval);
+    const render = () => {
+      const { width, height } = rect;
+      if (width === 0 || height === 0) {
+        requestRef.current = requestAnimationFrame(render);
+        return;
+      }
 
+      // Update data
       if (isStreaming) {
         historyRef.current.push(lastLevelRef.current);
         historyRef.current.shift();
       } else {
-        historyRef.current.fill(0);
+        historyRef.current.push(0);
+        historyRef.current.shift();
       }
 
       ctx.clearRect(0, 0, width, height);
 
-      const barWidth = width / historyRef.current.length;
-      const gradient = ctx.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, '#60a5fa');
-      gradient.addColorStop(1, '#2563eb');
+      const bars = historyRef.current;
 
-      ctx.fillStyle = gradient;
+      if (mode === 'bars') {
+        const barWidth = width / bars.length;
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, color + '44');
 
-      historyRef.current.forEach((level, i) => {
-        const visualBoost = Math.sqrt(level) * 1.5;
-        const normalizedLevel = Math.max(0.05, Math.min(visualBoost, 1.0));
+        bars.forEach((val, i) => {
+          const visualLevel = Math.sqrt(val) * 1.5;
+          const h = Math.max(2, visualLevel * height * 0.8);
+          const x = i * barWidth;
+          const y = (height - h) / 2;
 
-        const barHeight = normalizedLevel * height * 0.8;
-        const x = i * barWidth;
-        const y = (height - barHeight) / 2;
-
-        const radius = 2;
+          ctx.beginPath();
+          ctx.fillStyle = gradient;
+          if (ctx.roundRect) {
+            ctx.roundRect(x + 1, y, Math.max(1, barWidth - 1), h, 1);
+          } else {
+            ctx.rect(x + 1, y, Math.max(1, barWidth - 1), h);
+          }
+          ctx.fill();
+        });
+      } else if (mode === 'wave') {
+        const barWidth = width / bars.length;
         ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        ctx.moveTo(0, height / 2);
+        bars.forEach((val, i) => {
+          const visualLevel = Math.sqrt(val) * 1.5;
+          const x = i * barWidth;
+          const y = (height / 2) + ((visualLevel * height * 0.4) * (i % 2 === 0 ? 1 : -1));
+          ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      } else if (mode === 'compact') {
+        const visualLevel = Math.sqrt(lastLevelRef.current) * 1.2;
+        const w = Math.min(width, visualLevel * width);
+
+        ctx.fillStyle = color + '22';
         if (ctx.roundRect) {
-          ctx.roundRect(x + 1, y, barWidth - 2, barHeight, radius);
-        } else {
-          ctx.rect(x + 1, y, barWidth - 2, barHeight);
+          ctx.beginPath();
+          ctx.roundRect(0, height / 2 - 2, width, 4, 2);
+          ctx.fill();
         }
-        ctx.fill();
-      });
+
+        ctx.fillStyle = color;
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(0, height / 2 - 2, w, 4, 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(0, height / 2 - 2, w, 4);
+        }
+      }
+
+      requestRef.current = requestAnimationFrame(render);
     };
 
-    animationId = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(animationId);
-  }, [isStreaming]);
+    requestRef.current = requestAnimationFrame(render);
+    window.addEventListener('resize', setSize);
+    return () => {
+      cancelAnimationFrame(requestRef.current);
+      window.removeEventListener('resize', setSize);
+    }
+  }, [isStreaming, color, mode]);
 
   return (
-    <div className="w-full bg-black/20 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden p-4 h-24 flex items-center justify-center relative">
-      <canvas
-        ref={canvasRef}
-        width={400}
-        height={60}
-        className="w-full h-full opacity-80"
-      />
-      {!isStreaming && (
-        <div className="absolute inset-0 flex items-center justify-center text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-          Ses bekleniyor...
-        </div>
-      )}
-      {isStreaming && (
-        <div className="absolute top-2 left-3 text-[9px] uppercase font-black text-primary/50 tracking-tighter">
-          Live Waveform
-        </div>
-      )}
-    </div>
+    <canvas
+      ref={canvasRef}
+      style={{ width: '100%', height: '100%' }}
+      className="opacity-90 transition-transform"
+    />
   );
 }

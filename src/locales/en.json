@@ -1,0 +1,81 @@
+{
+  "header": {
+    "broadcast": "Broadcast Control",
+    "listen": "Discover Broadcasts",
+    "settings": "App Settings"
+  },
+  "sidebar": {
+    "broadcast": "Broadcast",
+    "listen": "Listen",
+    "settings": "Settings"
+  },
+  "broadcast": {
+    "title": "Audio Broadcast",
+    "subtitle": "Real-time audio streaming to devices on local network",
+    "status": {
+      "live": "LIVE",
+      "pause": "PAUSE",
+      "streaming": "Broadcasting Status",
+      "activeHint": "Your audio is currently being shared on the local network.",
+      "inactiveHint": "Select a device to start broadcasting.",
+      "stop": "Stop Broadcast",
+      "start": "Start Broadcast",
+      "liveNote": "Live Transfer in Progress"
+    },
+    "profile": "Broadcaster Profile",
+    "nameLabel": "Display Name",
+    "namePlaceholder": "Your name...",
+    "deviceSelection": "Device Selection",
+    "sourceLabel": "Audio Source",
+    "monitor": "Signal Monitor"
+  },
+  "listen": {
+    "title": "Listen to Streams",
+    "subtitle": "Discover active broadcasters on the local network",
+    "searchPlaceholder": "Search broadcaster or ID...",
+    "outputDevice": "Output Device",
+    "selectSpeaker": "Select speakers",
+    "noPeers": "No Active Broadcasts Found",
+    "noPeersHint": "No one is broadcasting on the network currently.",
+    "scanning": "Scanning Network...",
+    "active": "Active",
+    "unnamed": "Unnamed",
+    "volume": "Volume Control",
+    "stop": "Disconnect",
+    "start": "Start Listening"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage app preferences and profile",
+    "profile": {
+      "title": "Profile",
+      "description": "Others on the network will see you with this info.",
+      "label": "Display Name",
+      "placeholder": "Enter your name...",
+      "save": "Save",
+      "saved": "Saved",
+      "userId": "Unique ID (User ID)",
+      "userIdHint": "*This ID is automatically assigned by the system."
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize your application experience.",
+      "language": "Select Language",
+      "theme": "App Theme",
+      "themeSystem": "System",
+      "themeLight": "Light",
+      "themeDark": "Dark"
+    },
+    "about": {
+      "title": "About",
+      "version": "Version",
+      "developer": "Developer",
+      "tech": "Technology",
+      "github": "GitHub Project",
+      "reset": "Reset Data"
+    }
+  },
+  "common": {
+    "loading": "Loading..."
+  }
+}

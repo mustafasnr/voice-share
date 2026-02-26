@@ -144,8 +144,13 @@ export function BroadcastView() {
               <span className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sinyal Monitörü</span>
             </div>
 
-            <div className="bg-black/20 rounded-2xl p-4 border border-border/10 backdrop-blur-sm">
-              <AudioVisualizer />
+            <div className="bg-black/20 rounded-2xl p-4 border border-border/10 backdrop-blur-sm h-24">
+              <AudioVisualizer
+                level={useStore(s => s.audioLevel)}
+                isStreaming={isStreaming}
+                color="#60a5fa"
+                barCount={60}
+              />
             </div>
           </div>
 

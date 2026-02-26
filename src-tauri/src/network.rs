@@ -35,6 +35,9 @@ impl AudioSender {
         #[cfg(not(windows))]
         socket.set_reuse_port(true)?;
         
+        // Paketin ağda daha uzağa gidebilmesi için TTL'i artırıyoruz
+        socket.set_multicast_ttl_v4(2)?;
+        
         let addr: SocketAddr = format!("{}:{}", multicast_ip, port).parse()?;
         let socket: UdpSocket = socket.into();
         
@@ -65,6 +68,10 @@ impl AudioReceiver {
         let multi_addr: std::net::Ipv4Addr = multicast_ip.parse()?;
         let interface: std::net::Ipv4Addr = "0.0.0.0".parse()?;
         socket.join_multicast_v4(&multi_addr, &interface).map_err(|e| anyhow::anyhow!("Multicast join error: {}", e))?;
+        
+        // Windows için receive buffer'ı 2MB yapalım, paket düşmesini engeller
+        let _ = socket.set_recv_buffer_size(2 * 1024 * 1024);
+        
         socket.set_nonblocking(true)?;
 
         Ok(Self { socket: socket.into() })
@@ -73,7 +80,14 @@ impl AudioReceiver {
     pub fn receive(&self) -> Result<Vec<AudioPacket>> {
         let mut packets = Vec::new();
         let mut buf = [0u8; 65507];
+        let mut received_any = false;
+        
         while let Ok((n, _)) = self.socket.recv_from(&mut buf) {
+            if !received_any {
+                received_any = true;
+                // İlk paket geldiğinde debug için yazalım
+                // println!("Veri alınıyor... Paket boyutu: {}", n);
+            }
             if let Ok(packet) = bincode::deserialize::<AudioPacket>(&buf[..n]) {
                 packets.push(packet);
             }
@@ -150,9 +164,9 @@ impl DiscoveryService {
             }
         }
 
-        // Timeout check (6 seconds)
+        // Timeout check (10 seconds)
         let mut peers = self.peers.lock().unwrap();
-        peers.retain(|(_, last_seen)| last_seen.elapsed() < Duration::from_secs(6));
+        peers.retain(|(_, last_seen)| last_seen.elapsed() < Duration::from_secs(10));
         
         Ok(())
     }

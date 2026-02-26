@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Radio, Volume2, Settings, AudioWaveform } from "lucide-react"
 import { useStore } from "../store/useStore"
+import { useIntl } from "react-intl"
 
 import {
   Sidebar,
@@ -15,11 +16,12 @@ import {
 
 export function AppSidebar() {
   const { activeTab, setActiveTab } = useStore()
+  const intl = useIntl()
 
   const items = [
-    { id: "broadcast", label: "Yayınla", icon: Radio },
-    { id: "listen", label: "Dinle", icon: Volume2 },
-    { id: "settings", label: "Ayarlar", icon: Settings },
+    { id: "broadcast", label: intl.formatMessage({ id: "sidebar.broadcast" }), icon: Radio },
+    { id: "listen", label: intl.formatMessage({ id: "sidebar.listen" }), icon: Volume2 },
+    { id: "settings", label: intl.formatMessage({ id: "sidebar.settings" }), icon: Settings },
   ]
 
   return (
@@ -51,8 +53,8 @@ export function AppSidebar() {
                   onClick={() => setActiveTab(item.id)}
                   tooltip={item.label}
                   className={`h-11 transition-all duration-200 ${isActive
-                      ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
-                      : "text-muted-foreground hover:bg-accent"
+                    ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary"
+                    : "text-muted-foreground hover:bg-accent"
                     }`}
                 >
                   <Icon className={`size-5 ${isActive ? "scale-110" : ""}`} />
@@ -68,7 +70,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="py-6 flex items-center justify-center">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-[10px] font-bold tracking-widest text-muted-foreground/30 uppercase">
+          <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
             v1.0.0-beta
           </span>
         </div>

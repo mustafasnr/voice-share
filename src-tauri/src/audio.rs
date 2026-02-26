@@ -134,6 +134,7 @@ pub struct PlaybackEngine {
     channels: u8,
     sample_rate: u32,
     stop_tx: Option<mpsc::Sender<()>>,
+    last_sequence: Arc<Mutex<Option<u16>>>,
 }
 
 impl PlaybackEngine {
@@ -151,16 +152,21 @@ impl PlaybackEngine {
             channels,
             sample_rate,
             stop_tx: None,
+            last_sequence: Arc::new(Mutex::new(None)),
         })
     }
 
-    pub fn push_packet(&self, packet: AudioPacket) -> Result<()> {
+    fn decode_and_push(&self, data: Option<&[u8]>) -> Result<()> {
         let mut decoder = self.decoder.lock().unwrap();
-        // 20ms frame size per channel
         let samples_per_frame = (self.sample_rate * FRAME_SIZE_MS / 1000) as usize * self.channels as usize;
         let mut decoded = vec![0f32; samples_per_frame];
         
-        match decoder.decode_float(&packet.data, &mut decoded, false) {
+        let result = match data {
+            Some(d) => decoder.decode_float(d, &mut decoded, false),
+            None => decoder.decode_float(&[], &mut decoded, false), // PLC (Packet Loss Concealment)
+        };
+
+        match result {
             Ok(samples_per_channel) => {
                 let total_samples = samples_per_channel * self.channels as usize;
                 let mut producer = self.producer.lock().unwrap();
@@ -169,6 +175,26 @@ impl PlaybackEngine {
             Err(e) => eprintln!("Opus decode error: {}", e),
         }
         Ok(())
+    }
+
+    pub fn push_packet(&self, packet: AudioPacket) -> Result<()> {
+        let mut last_seq_lock = self.last_sequence.lock().unwrap();
+        
+        if let Some(last_seq) = *last_seq_lock {
+            let diff = packet.sequence.wrapping_sub(last_seq);
+            if diff > 1 && diff < 50 {
+                // Kayıp paketleri (PLC) doldur
+                for _ in 1..diff {
+                    let _ = self.decode_and_push(None);
+                }
+            } else if diff == 0 || diff > 60000 {
+                // Eski veya mükerrer paket, çöpe at
+                return Ok(());
+            }
+        }
+        
+        *last_seq_lock = Some(packet.sequence);
+        self.decode_and_push(Some(&packet.data))
     }
 
     pub fn set_volume(&self, volume: f32) {
@@ -203,11 +229,29 @@ impl PlaybackEngine {
                     buffer_size: cpal::BufferSize::Default,
                 };
 
+                let mut is_prebuffering = true;
+                let prebuffer_threshold = (sample_rate / 1000 * FRAME_SIZE_MS * 3 * channels as u32) as usize;
+
                 let stream = device.build_output_stream(
                     &config,
                     move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
                         let vol = *volume.lock().unwrap();
                         let mut consumer = consumer.lock().unwrap();
+                        
+                        if is_prebuffering {
+                            if consumer.len() >= prebuffer_threshold {
+                                is_prebuffering = false;
+                            } else {
+                                // Tampon dolana kadar sessizlik bas
+                                data.fill(0.0);
+                                return;
+                            }
+                        }
+
+                        if consumer.is_empty() {
+                            is_prebuffering = true;
+                        }
+
                         for sample in data.iter_mut() {
                             *sample = consumer.pop().unwrap_or(0.0) * vol;
                         }

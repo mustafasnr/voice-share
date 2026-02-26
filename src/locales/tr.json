@@ -1,0 +1,81 @@
+{
+  "header": {
+    "broadcast": "Yayın Kontrolü",
+    "listen": "Yayınları Keşfet",
+    "settings": "Uygulama Ayarları"
+  },
+  "sidebar": {
+    "broadcast": "Yayınla",
+    "listen": "Dinle",
+    "settings": "Ayarlar"
+  },
+  "broadcast": {
+    "title": "Ses Yayını",
+    "subtitle": "Yerel ağdaki cihazlara gerçek zamanlı ses aktarımı",
+    "status": {
+      "live": "CANLI",
+      "pause": "DURAKLATILDI",
+      "streaming": "Yayın Durumu",
+      "activeHint": "Sesiniz şu an yerel ağda paylaşılıyor.",
+      "inactiveHint": "Yayını başlatmak için bir cihaz seçin.",
+      "stop": "Yayını Durdur",
+      "start": "Yayını Başlat",
+      "liveNote": "Canlı Aktarım Devam Ediyor"
+    },
+    "profile": "Yayıncı Profili",
+    "nameLabel": "Görünen Ad",
+    "namePlaceholder": "İsminiz...",
+    "deviceSelection": "Cihaz Seçimi",
+    "sourceLabel": "Ses Kaynağı",
+    "monitor": "Sinyal Monitörü"
+  },
+  "listen": {
+    "title": "Yayınları Dinle",
+    "subtitle": "Yerel ağdaki aktif yayıncıları keşfet",
+    "searchPlaceholder": "Yayıncı veya ID ara...",
+    "outputDevice": "Çıkış Cihazı",
+    "selectSpeaker": "Hoparlör seçin",
+    "noPeers": "Aktif Yayın Bulunamadı",
+    "noPeersHint": "Şu an ağda kimse yayın yapmıyor.",
+    "scanning": "Ağ Taranıyor...",
+    "active": "Aktif",
+    "unnamed": "İsimsiz",
+    "volume": "Ses Gücü",
+    "stop": "Bağlantıyı Kes",
+    "start": "Dinlemeye Başla"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "subtitle": "Uygulama tercihlerini ve profilini yönet",
+    "profile": {
+      "title": "Profil",
+      "description": "Ağdaki diğer kullanıcılar seni bu bilgilerle görecek.",
+      "label": "Görünen İsim",
+      "placeholder": "İsminizi girin...",
+      "save": "Kaydet",
+      "saved": "Kaydedildi",
+      "userId": "Benzersiz Kimlik (User ID)",
+      "userIdHint": "*Bu kimlik sistem tarafından otomatik atanır."
+    },
+    "preferences": {
+      "title": "Tercihler",
+      "description": "Uygulama deneyimini özelleştirin.",
+      "language": "Dil Seçimi",
+      "theme": "Uygulama Teması",
+      "themeSystem": "Sistem",
+      "themeLight": "Açık",
+      "themeDark": "Koyu"
+    },
+    "about": {
+      "title": "Hakkında",
+      "version": "Versiyon",
+      "developer": "Geliştirici",
+      "tech": "Teknoloji",
+      "github": "GitHub Projesi",
+      "reset": "Verileri Sıfırla"
+    }
+  },
+  "common": {
+    "loading": "Yükleniyor..."
+  }
+}

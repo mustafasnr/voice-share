@@ -5,6 +5,7 @@ import { AppSidebar } from './components/AppSidebar';
 import { BroadcastView } from './components/BroadcastView';
 import { ListenView } from './components/ListenView';
 import { SettingsView } from './components/SettingsView';
+import { FormattedMessage } from 'react-intl';
 
 function App() {
   const {
@@ -29,7 +30,7 @@ function App() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background dark">
+      <div className="flex min-h-screen w-full">
         <AppSidebar />
         <SidebarInset className="flex w-full flex-col overflow-hidden">
           {/* HEADER FOR MOBILE & STICKY TRIGGER */}
@@ -38,9 +39,9 @@ function App() {
               <SidebarTrigger className="-ml-1" />
               <div className="h-4 w-px bg-border/40 mx-2 hidden sm:block" />
               <h1 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                {activeTab === 'broadcast' && "Yayın Kontrolü"}
-                {activeTab === 'listen' && "Yayınları Keşfet"}
-                {activeTab === 'settings' && "Uygulama Ayarları"}
+                {activeTab === 'broadcast' && <FormattedMessage id="header.broadcast" />}
+                {activeTab === 'listen' && <FormattedMessage id="header.listen" />}
+                {activeTab === 'settings' && <FormattedMessage id="header.settings" />}
               </h1>
             </div>
 

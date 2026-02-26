@@ -14,6 +14,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import DevicePicker from "./device-picker";
+import { AudioVisualizer } from "./AudioVisualizer";
 
 export function ListenView() {
   const {
@@ -158,6 +159,18 @@ export function ListenView() {
                     )}
                     <span className="truncate flex-1">{peer.device_name}</span>
                   </div>
+
+                  {/* Audio Visualizer */}
+                  {isListening && (
+                    <div className="h-4 w-full bg-secondary/20 rounded-full overflow-hidden border border-border/10">
+                      <AudioVisualizer
+                        level={useStore(s => s.peerLevels[peer.user_id] || 0)}
+                        isStreaming={isListening}
+                        color="#60a5fa"
+                        mode="compact"
+                      />
+                    </div>
+                  )}
 
                   {/* Volume Control (Compact Design) */}
                   {isListening && (

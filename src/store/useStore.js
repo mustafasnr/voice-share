@@ -15,8 +15,14 @@ export const useStore = create((set, get) => ({
   audioLevel: 0,
   listeningTo: [], // user_ids of peers being listened to
   peerVolumes: {}, // { user_id: 1.0 }
+  peerLevels: {}, // { user_id: 0.0 }
+  locale: localStorage.getItem('locale') || (navigator.language.split(/[-_]/)[0] === 'tr' ? 'tr' : 'en'),
 
   setActiveTab: (tab) => set({ activeTab: tab }),
+  setLocale: (locale) => {
+    localStorage.setItem('locale', locale);
+    set({ locale });
+  },
   setSelectedInput: (id) => set({ selectedInput: id }),
   setSelectedOutput: (id) => set({ selectedOutput: id }),
 
@@ -47,6 +53,13 @@ export const useStore = create((set, get) => ({
     // Setup listeners
     listen('audio-level', (event) => {
       set({ audioLevel: event.payload });
+    });
+
+    listen('peer-audio-level', (event) => {
+      const { user_id, level } = event.payload;
+      set((state) => ({
+        peerLevels: { ...state.peerLevels, [user_id]: level }
+      }));
     });
 
     return id;
