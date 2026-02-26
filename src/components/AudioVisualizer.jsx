@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 
 /**
- * Highly optimized and stylish Audio Visualizer
+ * Responsive and stylish Audio Visualizer
  * @param {number} level - Current audio peak level (0.0 to 1.0)
  * @param {boolean} isStreaming - Whether audio is active
  * @param {string} color - Primary color for the waveform
@@ -13,36 +13,44 @@ export function AudioVisualizer({
   isStreaming = false,
   color = '#60a5fa',
   barCount = 40,
-  mode = 'bars'
+  mode = 'bars',
 }) {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const historyRef = useRef(new Array(barCount).fill(0));
   const requestRef = useRef();
   const lastLevelRef = useRef(0);
 
-  // Sync level to ref to avoid re-renders while keeping the animation loop alive
+  // Keep latest level in a ref to avoid extra renders
   useEffect(() => {
     lastLevelRef.current = level;
   }, [level]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
     const ctx = canvas.getContext('2d', { alpha: true });
 
-    // Set internal resolution higher for Retina displays
     const dpr = window.devicePixelRatio || 1;
-    let rect = canvas.getBoundingClientRect();
+    let rect = { width: 0, height: 0 };
 
-    const setSize = () => {
-      if (!canvas) return;
-      rect = canvas.getBoundingClientRect();
+    const setSize = (entry) => {
+      const cr = entry?.contentRect || container.getBoundingClientRect();
+      rect = { width: cr.width, height: cr.height };
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
     };
 
+    // Initial sizing
     setSize();
+
+    // Observe container size changes
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) setSize(entries[0]);
+    });
+    observer.observe(container);
 
     const render = () => {
       const { width, height } = rect;
@@ -51,7 +59,7 @@ export function AudioVisualizer({
         return;
       }
 
-      // Update data
+      // Update history based on streaming state
       if (isStreaming) {
         historyRef.current.push(lastLevelRef.current);
         historyRef.current.shift();
@@ -61,7 +69,6 @@ export function AudioVisualizer({
       }
 
       ctx.clearRect(0, 0, width, height);
-
       const bars = historyRef.current;
 
       if (mode === 'bars') {
@@ -69,13 +76,11 @@ export function AudioVisualizer({
         const gradient = ctx.createLinearGradient(0, 0, 0, height);
         gradient.addColorStop(0, color);
         gradient.addColorStop(1, color + '44');
-
         bars.forEach((val, i) => {
           const visualLevel = Math.sqrt(val) * 1.5;
           const h = Math.max(2, visualLevel * height * 0.8);
           const x = i * barWidth;
           const y = (height - h) / 2;
-
           ctx.beginPath();
           ctx.fillStyle = gradient;
           if (ctx.roundRect) {
@@ -92,7 +97,6 @@ export function AudioVisualizer({
         ctx.lineWidth = 2;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
-
         ctx.moveTo(0, height / 2);
         bars.forEach((val, i) => {
           const visualLevel = Math.sqrt(val) * 1.5;
@@ -104,14 +108,12 @@ export function AudioVisualizer({
       } else if (mode === 'compact') {
         const visualLevel = Math.sqrt(lastLevelRef.current) * 1.2;
         const w = Math.min(width, visualLevel * width);
-
         ctx.fillStyle = color + '22';
         if (ctx.roundRect) {
           ctx.beginPath();
           ctx.roundRect(0, height / 2 - 2, width, 4, 2);
           ctx.fill();
         }
-
         ctx.fillStyle = color;
         if (ctx.roundRect) {
           ctx.beginPath();
@@ -126,18 +128,20 @@ export function AudioVisualizer({
     };
 
     requestRef.current = requestAnimationFrame(render);
-    window.addEventListener('resize', setSize);
+
     return () => {
       cancelAnimationFrame(requestRef.current);
-      window.removeEventListener('resize', setSize);
-    }
+      observer.disconnect();
+    };
   }, [isStreaming, color, mode]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{ width: '100%', height: '100%' }}
-      className="opacity-90 transition-transform"
-    />
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }} className="relative">
+      <canvas
+        ref={canvasRef}
+        style={{ width: '100%', height: '100%' }}
+        className="opacity-90 transition-transform"
+      />
+    </div>
   );
 }
