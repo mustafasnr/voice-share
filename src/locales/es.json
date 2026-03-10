@@ -1,0 +1,84 @@
+{
+  "header": {
+    "broadcast": "Control de transmisión",
+    "listen": "Descubrir transmisiones",
+    "settings": "Configuración de la aplicación"
+  },
+  "sidebar": {
+    "broadcast": "Transmitir",
+    "listen": "Escuchar",
+    "settings": "Configuración"
+  },
+  "broadcast": {
+    "title": "Transmisión de audio",
+    "subtitle": "Transmisión de audio en tiempo real a dispositivos en la red local",
+    "status": {
+      "live": "EN VIVO",
+      "pause": "PAUSADO",
+      "streaming": "Estado de transmisión",
+      "activeHint": "Tu audio se está compartiendo actualmente en la red local.",
+      "inactiveHint": "Selecciona un dispositivo para iniciar la transmisión.",
+      "stop": "Detener transmisión",
+      "start": "Iniciar transmisión",
+      "liveNote": "Transferencia en vivo en curso"
+    },
+    "profile": "Perfil del transmisor",
+    "nameLabel": "Nombre para mostrar",
+    "namePlaceholder": "Tu nombre...",
+    "deviceSelection": "Selección de dispositivo",
+    "sourceLabel": "Fuente de audio",
+    "editName": "Editar nombre",
+    "monitor": "Monitor de señal"
+  },
+  "listen": {
+    "title": "Escuchar transmisiones",
+    "subtitle": "Descubre transmisores activos en la red local",
+    "searchPlaceholder": "Buscar transmisor o ID...",
+    "outputDevice": "Dispositivo de salida",
+    "selectSpeaker": "Seleccionar altavoces",
+    "noPeers": "No se encontraron transmisiones activas",
+    "noPeersHint": "Nadie está transmitiendo en la red actualmente.",
+    "scanning": "Escaneando red...",
+    "active": "Activo",
+    "unnamed": "Sin nombre",
+    "volume": "Control de volumen",
+    "stop": "Desconectar",
+    "start": "Empezar a escuchar"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestionar las preferencias y el perfil de la aplicación",
+    "profile": {
+      "title": "Perfil",
+      "description": "Otros en la red te verán con esta información.",
+      "label": "Nombre para mostrar",
+      "placeholder": "Ingresa tu nombre...",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "userId": "ID único (ID de usuario)",
+      "userIdHint": "*Este ID es asignado automáticamente por el sistema."
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "description": "Personaliza tu experiencia en la aplicación.",
+      "language": "Seleccionar idioma",
+      "theme": "Tema de la aplicación",
+      "themeSystem": "Sistema",
+      "themeLight": "Claro",
+      "themeDark": "Oscuro",
+      "autostart": "Iniciar al arrancar"
+    },
+    "about": {
+      "title": "Acerca de",
+      "version": "Versión",
+      "developer": "Desarrollador",
+      "tech": "Tecnología",
+      "github": "Proyecto de GitHub",
+      "reset": "Restablecer datos",
+      "quit": "Cerrar aplicación"
+    }
+  },
+  "common": {
+    "loading": "Cargando..."
+  }
+}

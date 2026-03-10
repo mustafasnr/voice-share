@@ -27,6 +27,7 @@
     "namePlaceholder": "İsminiz...",
     "deviceSelection": "Cihaz Seçimi",
     "sourceLabel": "Ses Kaynağı",
+    "editName": "Adını Düzelt",
     "monitor": "Sinyal Monitörü"
   },
   "listen": {
@@ -64,7 +65,8 @@
       "theme": "Uygulama Teması",
       "themeSystem": "Sistem",
       "themeLight": "Açık",
-      "themeDark": "Koyu"
+      "themeDark": "Koyu",
+      "autostart": "Açılışta Otomatik Başlat"
     },
     "about": {
       "title": "Hakkında",
@@ -72,7 +74,8 @@
       "developer": "Geliştirici",
       "tech": "Teknoloji",
       "github": "GitHub Projesi",
-      "reset": "Verileri Sıfırla"
+      "reset": "Verileri Sıfırla",
+      "quit": "Uygulamayı Kapat"
     }
   },
   "common": {

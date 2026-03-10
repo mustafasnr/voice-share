@@ -45,7 +45,8 @@ impl AudioSender {
     }
 
     pub fn send(&self, packet: &AudioPacket) -> Result<()> {
-        let data = bincode::serialize(packet)?;
+        let config = bincode::config::standard();
+        let data = bincode::serde::encode_to_vec(packet, config)?;
         self.socket.send_to(&data, self.addr)?;
         Ok(())
     }
@@ -88,7 +89,8 @@ impl AudioReceiver {
                 // İlk paket geldiğinde debug için yazalım
                 // println!("Veri alınıyor... Paket boyutu: {}", n);
             }
-            if let Ok(packet) = bincode::deserialize::<AudioPacket>(&buf[..n]) {
+            let config = bincode::config::standard();
+            if let Ok((packet, _)) = bincode::serde::decode_from_slice::<AudioPacket, _>(&buf[..n], config) {
                 packets.push(packet);
             }
         }
@@ -122,7 +124,8 @@ impl DiscoveryService {
 
     pub fn broadcast_announce(&self, info: StreamInfo) -> Result<()> {
         let msg = MessageType::Announce(info);
-        let data = bincode::serialize(&msg)?;
+        let config = bincode::config::standard();
+        let data = bincode::serde::encode_to_vec(&msg, config)?;
         let addr: SocketAddr = "255.255.255.255:11111".parse()?;
         self.socket.send_to(&data, addr)?;
         Ok(())
@@ -130,7 +133,8 @@ impl DiscoveryService {
 
     pub fn broadcast_heartbeat(&self, info: StreamInfo) -> Result<()> {
         let msg = MessageType::Heartbeat(info);
-        let data = bincode::serialize(&msg)?;
+        let config = bincode::config::standard();
+        let data = bincode::serde::encode_to_vec(&msg, config)?;
         let addr: SocketAddr = "255.255.255.255:11111".parse()?;
         self.socket.send_to(&data, addr)?;
         Ok(())
@@ -138,7 +142,8 @@ impl DiscoveryService {
 
     pub fn broadcast_goodbye(&self, user_id: String) -> Result<()> {
         let msg = MessageType::Goodbye(user_id);
-        let data = bincode::serialize(&msg)?;
+        let config = bincode::config::standard();
+        let data = bincode::serde::encode_to_vec(&msg, config)?;
         let addr: SocketAddr = "255.255.255.255:11111".parse()?;
         self.socket.send_to(&data, addr)?;
         Ok(())
@@ -147,7 +152,8 @@ impl DiscoveryService {
     pub fn update(&self) -> Result<()> {
         let mut buf = [0u8; 1024];
         while let Ok((n, _)) = self.socket.recv_from(&mut buf) {
-            if let Ok(msg) = bincode::deserialize::<MessageType>(&buf[..n]) {
+            let config = bincode::config::standard();
+            if let Ok((msg, _)) = bincode::serde::decode_from_slice::<MessageType, _>(&buf[..n], config) {
                 let mut peers = self.peers.lock().unwrap();
                 match msg {
                     MessageType::Announce(info) | MessageType::Heartbeat(info) => {

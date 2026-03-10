@@ -1,0 +1,84 @@
+{
+  "header": {
+    "broadcast": "Contrôle de diffusion",
+    "listen": "Découvrir les diffusions",
+    "settings": "Paramètres de l'application"
+  },
+  "sidebar": {
+    "broadcast": "Diffuser",
+    "listen": "Écouter",
+    "settings": "Paramètres"
+  },
+  "broadcast": {
+    "title": "Diffusion audio",
+    "subtitle": "Streaming audio en temps réel vers les appareils du réseau local",
+    "status": {
+      "live": "EN DIRECT",
+      "pause": "EN PAUSE",
+      "streaming": "Statut de diffusion",
+      "activeHint": "Votre audio est actuellement partagé sur le réseau local.",
+      "inactiveHint": "Sélectionnez un appareil pour démarrer la diffusion.",
+      "stop": "Arrêter la diffusion",
+      "start": "Démarrer la diffusion",
+      "liveNote": "Transfert en direct en cours"
+    },
+    "profile": "Profil du diffuseur",
+    "nameLabel": "Nom d'affichage",
+    "namePlaceholder": "Votre nom...",
+    "deviceSelection": "Sélection de l'appareil",
+    "sourceLabel": "Source audio",
+    "editName": "Modifier le nom",
+    "monitor": "Moniteur de signal"
+  },
+  "listen": {
+    "title": "Écouter les flux",
+    "subtitle": "Découvrir les diffuseurs actifs sur le réseau local",
+    "searchPlaceholder": "Rechercher un diffuseur ou un ID...",
+    "outputDevice": "Périphérique de sortie",
+    "selectSpeaker": "Sélectionner les haut-parleurs",
+    "noPeers": "Aucune diffusion active trouvée",
+    "noPeersHint": "Personne ne diffuse actuellement sur le réseau.",
+    "scanning": "Analyse du réseau...",
+    "active": "Actif",
+    "unnamed": "Sans nom",
+    "volume": "Contrôle du volume",
+    "stop": "Se déconnecter",
+    "start": "Commencer à écouter"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérer les préférences et le profil de l'application",
+    "profile": {
+      "title": "Profil",
+      "description": "Les autres utilisateurs du réseau vous verront avec ces informations.",
+      "label": "Nom d'affichage",
+      "placeholder": "Entrez votre nom...",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "userId": "ID unique (ID utilisateur)",
+      "userIdHint": "*Cet ID est attribué automatiquement par le système."
+    },
+    "preferences": {
+      "title": "Préférences",
+      "description": "Personnalisez votre expérience de l'application.",
+      "language": "Sélectionner la langue",
+      "theme": "Thème de l'application",
+      "themeSystem": "Système",
+      "themeLight": "Clair",
+      "themeDark": "Sombre",
+      "autostart": "Lancer au démarrage"
+    },
+    "about": {
+      "title": "À propos",
+      "version": "Version",
+      "developer": "Développeur",
+      "tech": "Technologie",
+      "github": "Projet GitHub",
+      "reset": "Réinitialiser les données",
+      "quit": "Quitter l'application"
+    }
+  },
+  "common": {
+    "loading": "Chargement..."
+  }
+}

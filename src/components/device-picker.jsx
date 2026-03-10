@@ -4,11 +4,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIntl } from "react-intl";
 
 import { Mic, Volume2, ChevronDown, Check } from "lucide-react";
 
 function DevicePicker({ devices, selected, onSelect }) {
-  const selectedDevice = devices.find((d) => d.name === selected);
+  const intl = useIntl();
+  const selectedDevice = devices.find((d) => d.id === selected);
 
   return (
     <DropdownMenu>
@@ -31,7 +33,7 @@ function DevicePicker({ devices, selected, onSelect }) {
             </div>
           ) : (
             <span className="text-sm text-muted-foreground truncate">
-              Ses kaynağı seç
+              {intl.formatMessage({ id: "listen.selectSpeaker", defaultMessage: "Select device" })}
             </span>
           )}
 
@@ -43,12 +45,12 @@ function DevicePicker({ devices, selected, onSelect }) {
         align="start"
         className="p-2 rounded-xl max-h-60 overflow-y-auto"
       >
-        {devices.map((device, idx) => {
-          const active = device.name === selected;
+        {devices.map((device) => {
+          const active = device.id === selected;
           return (
             <DropdownMenuItem
-              key={idx}
-              onClick={() => onSelect(device.name)}
+              key={device.id}
+              onClick={() => onSelect(device.id)}
               className={`flex items-center justify-start gap-3 rounded-lg px-3 py-3 cursor-pointer`}
             >
               {device.is_output ? (

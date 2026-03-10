@@ -1,0 +1,84 @@
+{
+  "header": {
+    "broadcast": "广播控制",
+    "listen": "发现广播",
+    "settings": "应用设置"
+  },
+  "sidebar": {
+    "broadcast": "广播",
+    "listen": "收听",
+    "settings": "设置"
+  },
+  "broadcast": {
+    "title": "音频广播",
+    "subtitle": "向局域网内的设备实时传输音频",
+    "status": {
+      "live": "直播中",
+      "pause": "已暂停",
+      "streaming": "广播状态",
+      "activeHint": "您的音频当前正在局域网内共享。",
+      "inactiveHint": "选择一个设备以开始广播。",
+      "stop": "停止广播",
+      "start": "开始广播",
+      "liveNote": "实时传输中"
+    },
+    "profile": "广播者资料",
+    "nameLabel": "显示名称",
+    "namePlaceholder": "您的名字...",
+    "deviceSelection": "设备选择",
+    "sourceLabel": "音频源",
+    "editName": "编辑名称",
+    "monitor": "信号监视器"
+  },
+  "listen": {
+    "title": "收听音频流",
+    "subtitle": "发现局域网内的活跃广播者",
+    "searchPlaceholder": "搜索广播者或 ID...",
+    "outputDevice": "输出设备",
+    "selectSpeaker": "选择扬声器",
+    "noPeers": "未找到活跃的广播",
+    "noPeersHint": "目前网络上没有人在广播。",
+    "scanning": "正在扫描网络...",
+    "active": "活跃",
+    "unnamed": "未命名",
+    "volume": "音量控制",
+    "stop": "断开连接",
+    "start": "开始收听"
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "管理应用首选项和个人资料",
+    "profile": {
+      "title": "个人资料",
+      "description": "网络上的其他人将看到您的这些信息。",
+      "label": "显示名称",
+      "placeholder": "输入您的名字...",
+      "save": "保存",
+      "saved": "已保存",
+      "userId": "唯一 ID (用户 ID)",
+      "userIdHint": "*此 ID 由系统自动分配。"
+    },
+    "preferences": {
+      "title": "首选项",
+      "description": "自定义您的应用体验。",
+      "language": "选择语言",
+      "theme": "应用主题",
+      "themeSystem": "系统默认",
+      "themeLight": "浅色",
+      "themeDark": "深色",
+      "autostart": "开机自动启动"
+    },
+    "about": {
+      "title": "关于",
+      "version": "版本",
+      "developer": "开发者",
+      "tech": "技术",
+      "github": "GitHub 项目",
+      "reset": "重置数据",
+      "quit": "退出应用"
+    }
+  },
+  "common": {
+    "loading": "加载中..."
+  }
+}

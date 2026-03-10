@@ -4,6 +4,8 @@ use anyhow::{anyhow, Result};
 use std::sync::{Arc, Mutex, mpsc};
 use std::time::{SystemTime, UNIX_EPOCH};
 use opus::{Application, Channels, Encoder, Decoder};
+use ringbuf::traits::{Split, Observer, Producer, Consumer};
+use ringbuf::{CachingProd, CachingCons};
 
 // Opus target sample rate
 const OPUS_SAMPLE_RATE: u32 = 48000;
@@ -31,13 +33,13 @@ impl CaptureEngine {
             let init_result = (|| -> Result<(cpal::Stream, u32, u8)> {
                 let mut devices = host.input_devices()?.into_iter().chain(host.output_devices()?);
                 let device = devices
-                    .find(|d| d.name().map(|n| n == device_name).unwrap_or(false))
+                    .find(|d| d.id().map(|id| id.to_string() == device_name).unwrap_or(false))
                     .ok_or_else(|| anyhow!("Device not found"))?;
 
                 let supported_config = device.default_input_config().or_else(|_| device.default_output_config())?;
                 let config: cpal::StreamConfig = supported_config.into();
                 
-                let source_sample_rate = config.sample_rate.0 as f64;
+                let source_sample_rate = config.sample_rate as f64;
                 let source_channels = config.channels as u8;
                 let opus_channels = if source_channels >= 2 { Channels::Stereo } else { Channels::Mono };
                 let channel_count = if source_channels >= 2 { 2 } else { 1 };
@@ -128,7 +130,7 @@ impl CaptureEngine {
 }
 
 pub struct PlaybackEngine {
-    producer: Arc<Mutex<ringbuf::Producer<f32, Arc<ringbuf::HeapRb<f32>>>>>,
+    producer: Arc<Mutex<CachingProd<Arc<ringbuf::HeapRb<f32>>>>>,
     volume: Arc<Mutex<f32>>,
     decoder: Arc<Mutex<Decoder>>,
     channels: u8,
@@ -210,7 +212,7 @@ impl PlaybackEngine {
         let rb = ringbuf::HeapRb::<f32>::new(self.sample_rate as usize * self.channels as usize * 4);
         let (prod, cons) = rb.split();
         self.producer = Arc::new(Mutex::new(prod));
-        let consumer = Arc::new(Mutex::new(cons));
+        let consumer = Arc::new(Mutex::<CachingCons<Arc<ringbuf::HeapRb<f32>>>>::new(cons));
         let volume = self.volume.clone();
         let channels = self.channels;
         let sample_rate = self.sample_rate;
@@ -220,12 +222,12 @@ impl PlaybackEngine {
             let init_result = (|| -> Result<cpal::Stream> {
                 let devices = host.output_devices()?;
                 let device = devices.into_iter()
-                    .find(|d| d.name().map(|n| n == device_name).unwrap_or(false))
+                    .find(|d| d.id().map(|id| id.to_string() == device_name).unwrap_or(false))
                     .ok_or_else(|| anyhow!("Device not found"))?;
 
                 let config = cpal::StreamConfig {
                     channels: channels as u16,
-                    sample_rate: cpal::SampleRate(sample_rate),
+                    sample_rate: sample_rate,
                     buffer_size: cpal::BufferSize::Default,
                 };
 
@@ -239,7 +241,7 @@ impl PlaybackEngine {
                         let mut consumer = consumer.lock().unwrap();
                         
                         if is_prebuffering {
-                            if consumer.len() >= prebuffer_threshold {
+                        if (*consumer).occupied_len() >= prebuffer_threshold {
                                 is_prebuffering = false;
                             } else {
                                 // Tampon dolana kadar sessizlik bas
@@ -253,7 +255,7 @@ impl PlaybackEngine {
                         }
 
                         for sample in data.iter_mut() {
-                            *sample = consumer.pop().unwrap_or(0.0) * vol;
+                            *sample = (*consumer).try_pop().unwrap_or(0.0) * vol;
                         }
                     },
                     |err| eprintln!("Playback error: {}", err),
@@ -295,12 +297,15 @@ pub fn get_all_capture_devices() -> Result<Vec<AudioDevice>> {
 
     if let Ok(input_devices) = host.input_devices() {
         for device in input_devices {
-            if let Ok(name) = device.name() {
+            if let (Ok(id), Ok(desc)) = (device.id(), device.description()) {
+                let id_str = id.to_string();
+                let name = desc.name();
                 let is_output = name.to_lowercase().contains("loopback") || 
                                   name.to_lowercase().contains("stereo mix");
                 
                 result.push(AudioDevice {
-                    name,
+                    id: id_str,
+                    name: name.to_string(),
                     is_output,
                 });
             }
@@ -309,11 +314,14 @@ pub fn get_all_capture_devices() -> Result<Vec<AudioDevice>> {
 
     if let Ok(output_devices) = host.output_devices() {
         for device in output_devices {
-            if let Ok(name) = device.name() {
-                if result.iter().any(|d| d.name == name) { continue; }
+            if let (Ok(id), Ok(desc)) = (device.id(), device.description()) {
+                let id_str = id.to_string();
+                let name = desc.name();
+                if result.iter().any(|d| d.id == id_str) { continue; }
 
                 result.push(AudioDevice {
-                    name,
+                    id: id_str,
+                    name: name.to_string(),
                     is_output: true,
                 });
             }
@@ -329,9 +337,10 @@ pub fn get_output_devices() -> Result<Vec<AudioDevice>> {
     let mut result = Vec::new();
 
     for device in devices {
-        if let Ok(name) = device.name() {
+        if let (Ok(id), Ok(desc)) = (device.id(), device.description()) {
             result.push(AudioDevice {
-                name,
+                id: id.to_string(),
+                name: desc.name().to_string(),
                 is_output: true,
             });
         }

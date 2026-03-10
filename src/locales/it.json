@@ -1,0 +1,84 @@
+{
+  "header": {
+    "broadcast": "Controllo Trasmissione",
+    "listen": "Scopri Trasmissioni",
+    "settings": "Impostazioni App"
+  },
+  "sidebar": {
+    "broadcast": "Trasmetti",
+    "listen": "Ascolta",
+    "settings": "Impostazioni"
+  },
+  "broadcast": {
+    "title": "Trasmissione Audio",
+    "subtitle": "Streaming audio in tempo reale ai dispositivi sulla rete locale",
+    "status": {
+      "live": "DAL VIVO",
+      "pause": "IN PAUSA",
+      "streaming": "Stato Trasmissione",
+      "activeHint": "Il tuo audio è attualmente condiviso sulla rete locale.",
+      "inactiveHint": "Seleziona un dispositivo per iniziare a trasmettere.",
+      "stop": "Interrompi Trasmissione",
+      "start": "Avvia Trasmissione",
+      "liveNote": "Trasferimento live in corso"
+    },
+    "profile": "Profilo Trasmettitore",
+    "nameLabel": "Nome Visualizzato",
+    "namePlaceholder": "Il tuo nome...",
+    "deviceSelection": "Selezione Dispositivo",
+    "sourceLabel": "Sorgente Audio",
+    "editName": "Modifica Nome",
+    "monitor": "Monitoraggio Segnale"
+  },
+  "listen": {
+    "title": "Ascolta gli Stream",
+    "subtitle": "Scopri i trasmettitori attivi sulla rete locale",
+    "searchPlaceholder": "Cerca trasmettitore o ID...",
+    "outputDevice": "Dispositivo di Uscita",
+    "selectSpeaker": "Seleziona altoparlanti",
+    "noPeers": "Nessuna trasmissione attiva trovata",
+    "noPeersHint": "Al momento nessuno sta trasmettendo sulla rete.",
+    "scanning": "Scansione della rete...",
+    "active": "Attivo",
+    "unnamed": "Senza nome",
+    "volume": "Controllo Volume",
+    "stop": "Disconnetti",
+    "start": "Inizia ad ascoltare"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Gestisci preferenze e profilo dell'app",
+    "profile": {
+      "title": "Profilo",
+      "description": "Gli altri sulla rete ti vedranno con queste informazioni.",
+      "label": "Nome Visualizzato",
+      "placeholder": "Inserisci il tuo nome...",
+      "save": "Salva",
+      "saved": "Salvato",
+      "userId": "ID Univoco (User ID)",
+      "userIdHint": "*Questo ID è assegnato automaticamente dal sistema."
+    },
+    "preferences": {
+      "title": "Preferenze",
+      "description": "Personalizza la tua esperienza con l'app.",
+      "language": "Seleziona Lingua",
+      "theme": "Tema dell'App",
+      "themeSystem": "Sistema",
+      "themeLight": "Chiaro",
+      "themeDark": "Scuro",
+      "autostart": "Lancia all'avvio"
+    },
+    "about": {
+      "title": "Informazioni",
+      "version": "Versione",
+      "developer": "Sviluppatore",
+      "tech": "Tecnologia",
+      "github": "Progetto GitHub",
+      "reset": "Ripristina Dati",
+      "quit": "Esci dall'app"
+    },
+    "common": {
+      "loading": "Caricamento..."
+    }
+  }
+}

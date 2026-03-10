@@ -1,0 +1,84 @@
+{
+  "header": {
+    "broadcast": "配信コントロール",
+    "listen": "配信を見つける",
+    "settings": "アプリ設定"
+  },
+  "sidebar": {
+    "broadcast": "配信",
+    "listen": "聴く",
+    "settings": "設定"
+  },
+  "broadcast": {
+    "title": "音声配信",
+    "subtitle": "ローカルネットワーク内のデバイスへのリアルタイム音声ストリーミング",
+    "status": {
+      "live": "ライブ",
+      "pause": "一時停止",
+      "streaming": "配信ステータス",
+      "activeHint": "現在、音声はローカルネットワーク上で共有されています。",
+      "inactiveHint": "配信を開始するにはデバイスを選択してください。",
+      "stop": "配信を停止",
+      "start": "配信を開始",
+      "liveNote": "ライブ転送中"
+    },
+    "profile": "配信者プロフィール",
+    "nameLabel": "表示名",
+    "namePlaceholder": "あなたの名前...",
+    "deviceSelection": "デバイスの選択",
+    "sourceLabel": "オーディオソース",
+    "editName": "名前を編集",
+    "monitor": "シグナルモニター"
+  },
+  "listen": {
+    "title": "配信を聴く",
+    "subtitle": "ローカルネットワーク上のアクティブな配信者を見つける",
+    "searchPlaceholder": "配信者またはIDを検索...",
+    "outputDevice": "出力デバイス",
+    "selectSpeaker": "スピーカーを選択",
+    "noPeers": "アクティブな配信が見つかりません",
+    "noPeersHint": "現在ネットワーク上で配信している人はいません。",
+    "scanning": "ネットワークをスキャン中...",
+    "active": "アクティブ",
+    "unnamed": "無名",
+    "volume": "音量コントロール",
+    "stop": "切断",
+    "start": "聴き始める"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "アプリの環境設定とプロフィールを管理する",
+    "profile": {
+      "title": "プロフィール",
+      "description": "ネットワーク上の他のユーザーにはこの情報が表示されます。",
+      "label": "表示名",
+      "placeholder": "名前を入力してください...",
+      "save": "保存",
+      "saved": "保存しました",
+      "userId": "固有ID (ユーザーID)",
+      "userIdHint": "*このIDはシステムによって自動的に割り当てられます。"
+    },
+    "preferences": {
+      "title": "環境設定",
+      "description": "アプリのエクスペリエンスをカスタマイズします。",
+      "language": "言語の選択",
+      "theme": "アプリのテーマ",
+      "themeSystem": "システム",
+      "themeLight": "ライト",
+      "themeDark": "ダーク",
+      "autostart": "起動時に自動実行"
+    },
+    "about": {
+      "title": "アプリについて",
+      "version": "バージョン",
+      "developer": "開発者",
+      "tech": "テクノロジー",
+      "github": "GitHubプロジェクト",
+      "reset": "データをリセット",
+      "quit": "アプリを終了"
+    }
+  },
+  "common": {
+    "loading": "読み込み中..."
+  }
+}

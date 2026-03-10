@@ -1,7 +1,9 @@
 import React from 'react';
 import { useStore } from '../store/useStore';
-import { Radio, Activity, Power, User } from 'lucide-react';
+import { Radio, Activity, Power, User, PencilLine } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { useIntl, FormattedMessage } from 'react-intl';
 
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
@@ -12,12 +14,15 @@ import { AudioVisualizer } from './AudioVisualizer';
 
 export function BroadcastView() {
   const {
-    userName, setUserName,
+    userName,
     userId,
     inputDevices,
     selectedInput, setSelectedInput,
     isStreaming, startBroadcast, stopBroadcast
   } = useStore();
+
+  const navigate = useNavigate();
+  const intl = useIntl();
 
   const handleToggleBroadcast = () => {
     if (isStreaming) {
@@ -33,9 +38,11 @@ export function BroadcastView() {
       {/* HEADER */}
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <h2 className="text-xl font-bold tracking-tight truncate">Ses Yayını</h2>
+          <h2 className="text-xl font-bold tracking-tight truncate">
+            <FormattedMessage id="broadcast.title" />
+          </h2>
           <p className="text-muted-foreground text-xs truncate">
-            Yerel ağdaki cihazlara gerçek zamanlı ses aktarımı
+            <FormattedMessage id="broadcast.subtitle" />
           </p>
         </div>
 
@@ -46,7 +53,11 @@ export function BroadcastView() {
             isStreaming && "animate-pulse"
           )}
         >
-          {isStreaming ? "CANLI" : "PAUSE"}
+          {isStreaming ? (
+            <FormattedMessage id="broadcast.status.live" />
+          ) : (
+            <FormattedMessage id="broadcast.status.pause" />
+          )}
         </Badge>
       </div>
 
@@ -58,23 +69,38 @@ export function BroadcastView() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-primary">
               <User className="w-4 h-4 shrink-0" />
-              <span className="font-bold uppercase tracking-widest text-[10px]">Yayıncı Profili</span>
+              <span className="font-bold uppercase tracking-widest text-[10px]">
+                <FormattedMessage id="broadcast.profile" />
+              </span>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground font-medium">Görünen Ad</label>
-              <div className="relative">
-                <Input
-                  value={userName}
-                  onChange={(e) => setUserName(e.target.value)}
-                  className="h-10 bg-background/40 pr-24"
-                  placeholder="İsminiz..."
-                />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <Badge variant="outline" className="text-[9px] font-mono opacity-50 whitespace-nowrap">
-                    ID: {userId.split('-')[1]}
-                  </Badge>
+              <label className="text-xs text-muted-foreground font-medium">
+                <FormattedMessage id="broadcast.nameLabel" />
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1 min-w-0">
+                  <Input
+                    value={userName}
+                    disabled
+                    className="h-10 bg-background/40 pr-24 cursor-default focus-visible:ring-0"
+                    placeholder={intl.formatMessage({ id: "broadcast.namePlaceholder" })}
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                    <Badge variant="outline" className="text-[9px] font-mono opacity-50 whitespace-nowrap">
+                      ID: {userId.split('-')[1]}
+                    </Badge>
+                  </div>
                 </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/settings')}
+                  className="h-10 gap-2 border-primary/20 hover:bg-primary/10 text-primary font-bold text-[10px] uppercase tracking-wider shrink-0"
+                >
+                  <PencilLine className="w-3.5 h-3.5" />
+                  <FormattedMessage id="broadcast.editName" />
+                </Button>
               </div>
             </div>
           </div>
@@ -83,7 +109,9 @@ export function BroadcastView() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-primary">
               <Radio className={cn("w-4 h-4 shrink-0", isStreaming && "animate-pulse")} />
-              <span className="font-bold uppercase tracking-widest text-[10px]">Ses Kaynağı</span>
+              <span className="font-bold uppercase tracking-widest text-[10px]">
+                <FormattedMessage id="broadcast.sourceLabel" />
+              </span>
             </div>
             <DevicePicker
               devices={inputDevices}
@@ -95,11 +123,13 @@ export function BroadcastView() {
           {/* ACTION AREA */}
           <div className="space-y-4 bg-secondary/10 p-4 rounded-xl border border-border/20">
             <div className="text-center space-y-1">
-              <h3 className="font-bold text-base text-primary/90">Yayın Durumu</h3>
+              <h3 className="font-bold text-base text-primary/90">
+                <FormattedMessage id="broadcast.status.streaming" />
+              </h3>
               <p className="text-xs text-muted-foreground">
                 {isStreaming
-                  ? "Sesiniz şu an yerel ağda paylaşılıyor."
-                  : "Yayını başlatmak için bir cihaz seçin."}
+                  ? <FormattedMessage id="broadcast.status.activeHint" />
+                  : <FormattedMessage id="broadcast.status.inactiveHint" />}
               </p>
             </div>
 
@@ -116,12 +146,12 @@ export function BroadcastView() {
               {isStreaming ? (
                 <>
                   <Power className="w-4 h-4 mr-2" />
-                  Yayını Durdur
+                  <FormattedMessage id="broadcast.status.stop" />
                 </>
               ) : (
                 <>
                   <Activity className="w-4 h-4 mr-2" />
-                  Yayını Başlat
+                  <FormattedMessage id="broadcast.status.start" />
                 </>
               )}
             </Button>
@@ -129,7 +159,9 @@ export function BroadcastView() {
             {isStreaming && (
               <div className="flex items-center justify-center gap-2 text-primary animate-pulse">
                 <div className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                <span className="text-[10px] font-bold tracking-widest uppercase">Canlı Aktarım Devam Ediyor</span>
+                <span className="text-[10px] font-bold tracking-widest uppercase">
+                  <FormattedMessage id="broadcast.status.liveNote" />
+                </span>
               </div>
             )}
           </div>
@@ -137,7 +169,7 @@ export function BroadcastView() {
           {/* VISUALIZER */}
           <div className="space-y-2 pt-2 border-t border-border/40">
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-              Sinyal Monitörü
+              <FormattedMessage id="broadcast.monitor" />
             </span>
             <div className="bg-black/20 rounded-xl p-3 border border-border/10 backdrop-blur-sm h-20">
               <AudioVisualizer

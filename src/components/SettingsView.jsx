@@ -11,6 +11,9 @@ import { Badge } from "./ui/badge";
 import { LanguageSelector } from "./LanguageSelector";
 import { ThemeSelector } from "./ThemeSelector";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { enable, isEnabled, disable } from "@tauri-apps/plugin-autostart";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 
 export function SettingsView() {
   const { userName, setUserName, userId } = useStore();
@@ -18,11 +21,29 @@ export function SettingsView() {
 
   const [tempName, setTempName] = useState(userName);
   const [isSaved, setIsSaved] = useState(false);
+  const [autostartEnabled, setAutostartEnabled] = useState(false);
+
+  React.useEffect(() => {
+    isEnabled().then(setAutostartEnabled).catch(console.error);
+  }, []);
 
   const handleSaveName = () => {
     setUserName(tempName);
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2000);
+  };
+
+  const handleAutostartChange = async (checked) => {
+    try {
+      if (checked) {
+        await enable();
+      } else {
+        await disable();
+      }
+      setAutostartEnabled(checked);
+    } catch (err) {
+      console.error("Autostart error:", err);
+    }
   };
 
   return (
@@ -125,6 +146,25 @@ export function SettingsView() {
               <ThemeSelector />
             </div>
 
+            <div className="space-y-1.5 pt-2">
+              <Label
+                htmlFor="autostart"
+                className="flex items-center justify-between border rounded-lg p-3 bg-muted/40 cursor-pointer"
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">
+                    {intl.formatMessage({ id: "settings.preferences.autostart" })}
+                  </span>
+                </div>
+
+                <Switch
+                  id="autostart"
+                  checked={autostartEnabled}
+                  className={"cursor-pointer!"}
+                  onCheckedChange={handleAutostartChange}
+                />
+              </Label>
+            </div>
           </CardContent>
         </Card>
 

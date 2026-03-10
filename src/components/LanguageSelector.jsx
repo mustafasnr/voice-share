@@ -18,7 +18,8 @@ const LANGUAGES = [
   { code: "it", label: "Italiano", flag: "/it.svg" },
   { code: "ru", label: "Русский", flag: "/ru.svg" },
   { code: "cn", label: "中文", flag: "/cn.svg" },
-  { code: "in", label: "हिन्दी", flag: "/in.svg" },
+  { code: "ind", label: "हिन्दी", flag: "/ind.svg" },
+  { code: "jp", label: "日本語", flag: "/jp.svg" },
 ];
 
 export function LanguageSelector() {

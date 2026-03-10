@@ -27,6 +27,7 @@
     "namePlaceholder": "Your name...",
     "deviceSelection": "Device Selection",
     "sourceLabel": "Audio Source",
+    "editName": "Edit Name",
     "monitor": "Signal Monitor"
   },
   "listen": {
@@ -64,7 +65,8 @@
       "theme": "App Theme",
       "themeSystem": "System",
       "themeLight": "Light",
-      "themeDark": "Dark"
+      "themeDark": "Dark",
+      "autostart": "Launch at Startup"
     },
     "about": {
       "title": "About",
@@ -72,7 +74,8 @@
       "developer": "Developer",
       "tech": "Technology",
       "github": "GitHub Project",
-      "reset": "Reset Data"
+      "reset": "Reset Data",
+      "quit": "Quit App"
     }
   },
   "common": {

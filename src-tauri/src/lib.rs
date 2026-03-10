@@ -1,4 +1,6 @@
-use tauri::Emitter;
+use tauri::{Emitter, Manager};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::TrayIconBuilder;
 use serde::Serialize;
 mod models;
 mod audio;
@@ -17,6 +19,7 @@ pub struct AppState {
     pub capture: Mutex<Option<CaptureEngine>>,
     pub playbacks: Mutex<HashMap<String, Arc<Mutex<PlaybackEngine>>>>,
     pub is_streaming: Arc<AtomicBool>,
+    pub tray: Mutex<Option<tauri::tray::TrayIcon>>,
 }
 
 #[tauri::command]
@@ -76,7 +79,7 @@ fn start_broadcast(
     // Determine if the source is an output (monitor) or input (mic)
     let devices = audio::get_all_capture_devices().unwrap_or_default();
     let is_output = devices.iter()
-        .find(|d| d.name == device_name)
+        .find(|d| d.id == device_name)
         .map(|d| d.is_output)
         .unwrap_or(false);
 
@@ -202,6 +205,17 @@ fn set_peer_volume(state: tauri::State<AppState>, user_id: String, volume: f32) 
     Ok(())
 }
 
+#[tauri::command]
+fn update_tray_menu(app: tauri::AppHandle, quit_text: String) -> Result<(), String> {
+    let tray = app.tray_by_id("main_tray");
+    if let Some(tray) = tray {
+        let quit_i = MenuItem::with_id(&app, "quit", quit_text, true, None::<&str>).map_err(|e| e.to_string())?;
+        let menu = Menu::with_items(&app, &[&quit_i]).map_err(|e| e.to_string())?;
+        let _ = tray.set_menu(Some(menu));
+    }
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -210,8 +224,11 @@ pub fn run() {
             capture: Mutex::new(None),
             playbacks: Mutex::new(HashMap::new()),
             is_streaming: Arc::new(AtomicBool::new(false)),
+            tray: Mutex::new(None),
         })
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .invoke_handler(tauri::generate_handler![
             get_input_devices,
             get_output_devices,
@@ -221,8 +238,47 @@ pub fn run() {
             stop_broadcast,
             start_listen,
             stop_listen,
-            set_peer_volume
+            set_peer_volume,
+            update_tray_menu
         ])
+        .setup(|app| {
+            let quit_i = MenuItem::with_id(app, "quit", "Kapat", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&quit_i])?;
+
+            let tray = TrayIconBuilder::with_id("main_tray")
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .show_menu_on_left_click(false)
+                .on_menu_event(move |app_handle, event| {
+                    if event.id == "quit" {
+                        app_handle.exit(0);
+                    }
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if let tauri::tray::TrayIconEvent::Click {
+                        button: tauri::tray::MouseButton::Left,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .build(app)?;
+
+            let state = app.state::<AppState>();
+            *state.tray.lock().unwrap() = Some(tray);
+            Ok(())
+        })
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = window.hide();
+            }
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

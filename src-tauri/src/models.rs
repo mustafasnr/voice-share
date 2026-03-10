@@ -31,6 +31,7 @@ pub struct AudioPacket {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AudioDevice {
+    pub id: String,
     pub name: String,
     pub is_output: bool,
 }

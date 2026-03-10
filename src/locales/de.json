@@ -1,0 +1,84 @@
+{
+  "header": {
+    "broadcast": "Sendesteuerung",
+    "listen": "Übertragungen entdecken",
+    "settings": "App-Einstellungen"
+  },
+  "sidebar": {
+    "broadcast": "Senden",
+    "listen": "Zuhören",
+    "settings": "Einstellungen"
+  },
+  "broadcast": {
+    "title": "Audio-Übertragung",
+    "subtitle": "Echtzeit-Audio-Streaming an Geräte im lokalen Netzwerk",
+    "status": {
+      "live": "LIVE",
+      "pause": "PAUSIERT",
+      "streaming": "Übertragungsstatus",
+      "activeHint": "Dein Audio wird derzeit im lokalen Netzwerk geteilt.",
+      "inactiveHint": "Wähle ein Gerät aus, um die Übertragung zu starten.",
+      "stop": "Übertragung stoppen",
+      "start": "Übertragung starten",
+      "liveNote": "Live-Übertragung läuft"
+    },
+    "profile": "Senderprofil",
+    "nameLabel": "Anzeigename",
+    "namePlaceholder": "Dein Name...",
+    "deviceSelection": "Geräteauswahl",
+    "sourceLabel": "Audioquelle",
+    "editName": "Namen bearbeiten",
+    "monitor": "Signalmonitor"
+  },
+  "listen": {
+    "title": "Streams anhören",
+    "subtitle": "Aktive Sender im lokalen Netzwerk entdecken",
+    "searchPlaceholder": "Sender oder ID suchen...",
+    "outputDevice": "Ausgabegerät",
+    "selectSpeaker": "Lautsprecher auswählen",
+    "noPeers": "Keine aktiven Übertragungen gefunden",
+    "noPeersHint": "Derzeit sendet niemand im Netzwerk.",
+    "scanning": "Netzwerk wird durchsucht...",
+    "active": "Aktiv",
+    "unnamed": "Unbenannt",
+    "volume": "Lautstärkeregelung",
+    "stop": "Trennen",
+    "start": "Zuhören starten"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "App-Einstellungen und Profil verwalten",
+    "profile": {
+      "title": "Profil",
+      "description": "Andere im Netzwerk werden dich mit diesen Informationen sehen.",
+      "label": "Anzeigename",
+      "placeholder": "Gib deinen Namen ein...",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "userId": "Eindeutige ID (Benutzer-ID)",
+      "userIdHint": "*Diese ID wird automatisch vom System vergeben."
+    },
+    "preferences": {
+      "title": "Präferenzen",
+      "description": "Passe dein App-Erlebnis an.",
+      "language": "Sprache auswählen",
+      "theme": "App-Design",
+      "themeSystem": "System",
+      "themeLight": "Hell",
+      "themeDark": "Dunkel",
+      "autostart": "Beim Systemstart ausführen"
+    },
+    "about": {
+      "title": "Über",
+      "version": "Version",
+      "developer": "Entwickler",
+      "tech": "Technologie",
+      "github": "GitHub-Projekt",
+      "reset": "Daten zurücksetzen",
+      "quit": "App beenden"
+    }
+  },
+  "common": {
+    "loading": "Wird geladen..."
+  }
+}

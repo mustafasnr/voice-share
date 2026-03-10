@@ -7,6 +7,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
+import { useIntl, FormattedMessage } from "react-intl";
 import DevicePicker from "./device-picker";
 import ListenPeer from "./listen-peer";
 
@@ -21,6 +22,7 @@ export function ListenView() {
   } = useStore();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const intl = useIntl();
 
   const filteredPeers = peers.filter(
     (p) =>
@@ -35,9 +37,11 @@ export function ListenView() {
       {/* HEADER */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-0.5">
-          <h2 className="text-xl font-bold tracking-tight truncate">Yayınları Dinle</h2>
+          <h2 className="text-xl font-bold tracking-tight truncate">
+            <FormattedMessage id="listen.title" />
+          </h2>
           <p className="text-muted-foreground text-xs truncate">
-            Yerel ağdaki aktif yayıncıları keşfet
+            <FormattedMessage id="listen.subtitle" />
           </p>
         </div>
         <Button
@@ -54,7 +58,7 @@ export function ListenView() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Yayıncı veya ID ara..."
+          placeholder={intl.formatMessage({ id: "listen.searchPlaceholder" })}
           className="pl-9 h-9 bg-card/40"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -69,8 +73,12 @@ export function ListenView() {
               <Volume2 className="w-4 h-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold truncate">Çıkış Cihazı</p>
-              <p className="text-xs text-muted-foreground truncate">Hoparlör seçin</p>
+              <p className="text-sm font-bold truncate">
+                <FormattedMessage id="listen.outputDevice" />
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                <FormattedMessage id="listen.selectSpeaker" />
+              </p>
             </div>
           </div>
 
@@ -92,13 +100,15 @@ export function ListenView() {
               <Users className="w-8 h-8 text-muted-foreground/50" />
             </div>
             <div className="max-w-xs min-w-0">
-              <h3 className="text-base font-bold">Aktif Yayın Bulunamadı</h3>
+              <h3 className="text-base font-bold">
+                <FormattedMessage id="listen.noPeers" />
+              </h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Şu an ağda kimse yayın yapmıyor.
+                <FormattedMessage id="listen.noPeersHint" />
               </p>
             </div>
             <Badge variant="secondary" className="animate-pulse bg-primary/5 text-primary border-primary/20">
-              Ağ Taranıyor...
+              <FormattedMessage id="listen.scanning" />
             </Badge>
           </div>
         ) : (
