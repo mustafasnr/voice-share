@@ -1,0 +1,17 @@
+﻿{
+  "version": "1.0.5",
+  "notes": "Bug fixes and improvements",
+  "pub_date": "2026-03-12T00:12:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "msi": {
+        "url": "https://github.com/mustafasnr/voice-share/releases/download/v1.0.5/Voice_Share_1.0.5_x64_en-US.msi",
+        "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZHBwd0Z0bDdVejB3MERLQ2lzMGVqYzRiVlBmcTV2YzV2Mmwvb3ZuQ0JETXlObEhpbmFtbGFteHBGNU9sV3FzS2JuKzdhWkJ5YVpIaWtMeEZZWnBFMVNGVVR2REJ6b2d3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzczMjYzMTI5CWZpbGU6Vm9pY2UgU2hhcmVfMS4wLjVfeDY0X2VuLVVTLm1zaQpEcmVLNHYxb3RRbEU3N2hCMncwM0hob0hVTlY3VnA4REZ5NHErVmJZN2ZpazRxbkdzb05mSHdlcFg0c0Y0d3BERGZSM3pYQUVNTndjbFNmY0RYc0ZEZz09Cg=="
+      },
+      "exe": {
+        "url": "https://github.com/mustafasnr/voice-share/releases/download/v1.0.5/Voice_Share_1.0.5_x64-setup.exe",
+        "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZHBwd0Z0bDdVenlzbmN5MlZCZXQrbXI2ZDlidUg2V0ZialludEJ1aXNxaTB1bGRiUEpNL1ZFZGRlUDRXcGJ4M3JxSnVCeWVtZWluWnV5SjlXM1NsOVpnbXh6V0hKWmdFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzczMjYzMTI5CWZpbGU6Vm9pY2UgU2hhcmVfMS4wLjVfeDY0LXNldHVwLmV4ZQprd0NwRjdxc05JeXVUKzBQWUFKSVRWdzFOTjQ0QWd2TjBLVVI2b3YzSmFqa1diVHFVVlVhSzBrbXF4SnNUTXFwY0tUQWtaeFZBdEU2cm5qdDBFZERBdz09Cg=="
+      }
+    }
+  }
+}
