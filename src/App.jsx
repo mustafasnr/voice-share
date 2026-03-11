@@ -3,9 +3,9 @@ import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from './components/ui/sidebar';
 import { AppSidebar } from './components/AppSidebar';
-import { BroadcastView } from './components/BroadcastView';
-import { ListenView } from './components/ListenView';
-import { SettingsView } from './components/SettingsView';
+import { BroadcastView } from './pages/BroadcastView';
+import { ListenView } from './pages/ListenView';
+import { SettingsView } from './pages/SettingsView';
 import { PageTitle } from './components/PageTitle';
 
 function App() {

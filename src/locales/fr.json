@@ -20,7 +20,8 @@
       "inactiveHint": "Sélectionnez un appareil pour démarrer la diffusion.",
       "stop": "Arrêter la diffusion",
       "start": "Démarrer la diffusion",
-      "liveNote": "Transfert en direct en cours"
+      "liveNote": "Transfert en direct en cours",
+      "nameRequired": "Vous devez définir un nom avant de commencer la diffusion !"
     },
     "profile": "Profil du diffuseur",
     "nameLabel": "Nom d'affichage",
@@ -71,7 +72,7 @@
     "about": {
       "title": "À propos",
       "version": "Version",
-      "developer": "Développeur",
+      "project": "Projet",
       "tech": "Technologie",
       "github": "Projet GitHub",
       "reset": "Réinitialiser les données",

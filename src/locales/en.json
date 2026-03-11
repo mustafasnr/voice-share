@@ -20,7 +20,8 @@
       "inactiveHint": "Select a device to start broadcasting.",
       "stop": "Stop Broadcast",
       "start": "Start Broadcast",
-      "liveNote": "Live Transfer in Progress"
+      "liveNote": "Live Transfer in Progress",
+      "nameRequired": "You must set a name before starting the broadcast!"
     },
     "profile": "Broadcaster Profile",
     "nameLabel": "Display Name",
@@ -71,7 +72,7 @@
     "about": {
       "title": "About",
       "version": "Version",
-      "developer": "Developer",
+      "project": "Project",
       "tech": "Technology",
       "github": "GitHub Project",
       "reset": "Reset Data",

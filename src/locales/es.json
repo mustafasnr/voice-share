@@ -20,7 +20,8 @@
       "inactiveHint": "Selecciona un dispositivo para iniciar la transmisión.",
       "stop": "Detener transmisión",
       "start": "Iniciar transmisión",
-      "liveNote": "Transferencia en vivo en curso"
+      "liveNote": "Transferencia en vivo en curso",
+      "nameRequired": "¡Debes establecer un nombre antes de comenzar la transmisión!"
     },
     "profile": "Perfil del transmisor",
     "nameLabel": "Nombre para mostrar",
@@ -71,7 +72,7 @@
     "about": {
       "title": "Acerca de",
       "version": "Versión",
-      "developer": "Desarrollador",
+      "project": "Proyecto",
       "tech": "Tecnología",
       "github": "Proyecto de GitHub",
       "reset": "Restablecer datos",

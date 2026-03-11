@@ -3,13 +3,13 @@ import { useStore } from "../store/useStore";
 import { Volume2, Users, Search, RefreshCw } from "lucide-react";
 import { cn } from "../lib/utils";
 
-import { Card } from "./ui/card";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Badge } from "./ui/badge";
+import { Card } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
 import { useIntl, FormattedMessage } from "react-intl";
-import DevicePicker from "./device-picker";
-import ListenPeer from "./listen-peer";
+import DevicePicker from "../components/DevicePicker";
+import ListenPeer from "../components/ListenPeer";
 
 export function ListenView() {
   const {

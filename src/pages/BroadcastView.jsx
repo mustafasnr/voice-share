@@ -5,12 +5,12 @@ import { cn } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useIntl, FormattedMessage } from 'react-intl';
 
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
-import DevicePicker from './device-picker';
-import { AudioVisualizer } from './AudioVisualizer';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
+import DevicePicker from '../components/DevicePicker';
+import { AudioVisualizer } from '../components/AudioVisualizer';
 
 export function BroadcastView() {
   const {
@@ -27,7 +27,7 @@ export function BroadcastView() {
   const handleToggleBroadcast = () => {
     if (isStreaming) {
       stopBroadcast();
-    } else if (selectedInput) {
+    } else if (selectedInput && userName?.trim()) {
       startBroadcast(selectedInput);
     }
   };
@@ -83,7 +83,10 @@ export function BroadcastView() {
                   <Input
                     value={userName}
                     disabled
-                    className="h-10 bg-background/40 pr-24 cursor-default focus-visible:ring-0"
+                    className={cn(
+                      "h-10 bg-background/40 pr-24 cursor-default focus-visible:ring-0",
+                      !userName?.trim() && "border-destructive/50 ring-destructive/20"
+                    )}
                     placeholder={intl.formatMessage({ id: "broadcast.namePlaceholder" })}
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -129,18 +132,22 @@ export function BroadcastView() {
               <p className="text-xs text-muted-foreground">
                 {isStreaming
                   ? <FormattedMessage id="broadcast.status.activeHint" />
-                  : <FormattedMessage id="broadcast.status.inactiveHint" />}
+                  : !userName?.trim()
+                    ? <span className="text-destructive font-semibold"><FormattedMessage id="broadcast.status.nameRequired" /></span>
+                    : <FormattedMessage id="broadcast.status.inactiveHint" />}
               </p>
             </div>
 
             <Button
-              disabled={!selectedInput}
+              disabled={!selectedInput || (!isStreaming && !userName?.trim())}
               onClick={handleToggleBroadcast}
               className={cn(
                 "h-12 w-full text-sm font-bold transition-all shadow-xl hover:scale-[1.01] active:scale-95",
                 isStreaming
                   ? "bg-destructive hover:bg-destructive/90 shadow-destructive/20"
-                  : "bg-primary hover:bg-primary/90 shadow-primary/20"
+                  : (!selectedInput || !userName?.trim())
+                    ? "bg-primary/40 cursor-not-allowed"
+                    : "bg-primary hover:bg-primary/90 shadow-primary/20"
               )}
             >
               {isStreaming ? (

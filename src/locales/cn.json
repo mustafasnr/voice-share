@@ -20,7 +20,8 @@
       "inactiveHint": "选择一个设备以开始广播。",
       "stop": "停止广播",
       "start": "开始广播",
-      "liveNote": "实时传输中"
+      "liveNote": "实时传输中",
+      "nameRequired": "开始广播前，您必须先设置一个名称！"
     },
     "profile": "广播者资料",
     "nameLabel": "显示名称",
@@ -71,7 +72,7 @@
     "about": {
       "title": "关于",
       "version": "版本",
-      "developer": "开发者",
+      "project": "项目",
       "tech": "技术",
       "github": "GitHub 项目",
       "reset": "重置数据",

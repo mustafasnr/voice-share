@@ -20,7 +20,8 @@
       "inactiveHint": "Wähle ein Gerät aus, um die Übertragung zu starten.",
       "stop": "Übertragung stoppen",
       "start": "Übertragung starten",
-      "liveNote": "Live-Übertragung läuft"
+      "liveNote": "Live-Übertragung läuft",
+      "nameRequired": "Sie müssen einen Namen festlegen, bevor Sie die Übertragung starten!"
     },
     "profile": "Senderprofil",
     "nameLabel": "Anzeigename",
@@ -71,7 +72,7 @@
     "about": {
       "title": "Über",
       "version": "Version",
-      "developer": "Entwickler",
+      "project": "Projekt",
       "tech": "Technologie",
       "github": "GitHub-Projekt",
       "reset": "Daten zurücksetzen",

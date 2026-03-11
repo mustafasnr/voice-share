@@ -20,7 +20,8 @@
       "inactiveHint": "Yayını başlatmak için bir cihaz seçin.",
       "stop": "Yayını Durdur",
       "start": "Yayını Başlat",
-      "liveNote": "Canlı Aktarım Devam Ediyor"
+      "liveNote": "Canlı Aktarım Devam Ediyor",
+      "nameRequired": "Yayını başlatmak için önce bir isim belirlemelisiniz!"
     },
     "profile": "Yayıncı Profili",
     "nameLabel": "Görünen Ad",
@@ -71,7 +72,7 @@
     "about": {
       "title": "Hakkında",
       "version": "Versiyon",
-      "developer": "Geliştirici",
+      "project": "Proje",
       "tech": "Teknoloji",
       "github": "GitHub Projesi",
       "reset": "Verileri Sıfırla",

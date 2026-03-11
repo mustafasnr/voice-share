@@ -20,7 +20,8 @@
       "inactiveHint": "配信を開始するにはデバイスを選択してください。",
       "stop": "配信を停止",
       "start": "配信を開始",
-      "liveNote": "ライブ転送中"
+      "liveNote": "ライブ転送中",
+      "nameRequired": "配信を開始する前に、名前を設定する必要があります！"
     },
     "profile": "配信者プロフィール",
     "nameLabel": "表示名",
@@ -71,7 +72,7 @@
     "about": {
       "title": "アプリについて",
       "version": "バージョン",
-      "developer": "開発者",
+      "project": "プロジェクト",
       "tech": "テクノロジー",
       "github": "GitHubプロジェクト",
       "reset": "データをリセット",
