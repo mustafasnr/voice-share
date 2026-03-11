@@ -36,7 +36,7 @@
   "plugins": {
     "updater": {
       "active": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdBRkNFNkVDOUI1QUFBQjgKUldTNHFscWI3T2I4ZWpmNmJhRWVQK3pPYVpVVFlldGRSb2MwVUpGUmhzRG5Ma29CQ0ZaNERFOVAK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDFGOTAyRjQxNkE2Q0MzMDYKUldRR3cyeHFRUytRSCsrZnkwamxjMElVazZ6RG1tYWFXSUdRSmNBWkU0M3ovUFRiYitIc0NnOTQK",
       "endpoints": [
         "https://github.com/mustafasnr/voice-share/releases/latest/download/latest.json"
       ]
