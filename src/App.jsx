@@ -9,6 +9,7 @@ import { ListenView } from './pages/ListenView';
 import { SettingsView } from './pages/SettingsView';
 import { PageTitle } from './components/PageTitle';
 
+
 function App() {
   const { initUser, startDiscovery, refreshDevices, refreshPeers } = useStore();
 
