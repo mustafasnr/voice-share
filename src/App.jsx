@@ -3,7 +3,6 @@ import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useStore } from './store/useStore';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from './components/ui/sidebar';
 import { AppSidebar } from './components/AppSidebar';
-import { UpdateNotification } from './components/UpdateNotification';
 import { BroadcastView } from './pages/BroadcastView';
 import { ListenView } from './pages/ListenView';
 import { SettingsView } from './pages/SettingsView';
@@ -42,7 +41,6 @@ function App() {
   return (
     <MemoryRouter initialEntries={['/broadcast']}>
       <SidebarProvider>
-        <UpdateNotification />
         <div className="flex h-screen w-full overflow-hidden">
           <AppSidebar />
           <SidebarInset className="flex min-w-0 flex-1 flex-col overflow-hidden">

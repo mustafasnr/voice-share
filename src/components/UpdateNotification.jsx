@@ -14,6 +14,7 @@ export function UpdateNotification() {
     async function checkUpdate() {
       try {
         const update = await check();
+        console.log(await update);
         if (update) {
           console.log('Update available:', update.version);
           setUpdate(update);
@@ -28,7 +29,7 @@ export function UpdateNotification() {
 
   const handleUpdate = async () => {
     if (!update) return;
-    
+
     setDownloading(true);
     try {
       let downloaded = 0;
@@ -70,7 +71,7 @@ export function UpdateNotification() {
               <Sparkles className="w-4 h-4" />
               <CardTitle className="text-sm">Yeni Güncelleme Mevcut</CardTitle>
             </div>
-            <button 
+            <button
               onClick={() => setUpdate(null)}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -89,8 +90,8 @@ export function UpdateNotification() {
                 <span>%{Math.round(progress)}</span>
               </div>
               <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-primary transition-all duration-300" 
+                <div
+                  className="h-full bg-primary transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -98,9 +99,9 @@ export function UpdateNotification() {
           )}
         </CardContent>
         <CardFooter>
-          <Button 
-            size="sm" 
-            className="w-full h-8 text-xs gap-2" 
+          <Button
+            size="sm"
+            className="w-full h-8 text-xs gap-2"
             onClick={handleUpdate}
             disabled={downloading}
           >
