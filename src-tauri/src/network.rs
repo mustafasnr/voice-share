@@ -14,13 +14,32 @@ pub fn generate_multicast_addr(user_id: &str) -> (String, u16) {
     
     let b3 = ((h >> 16) & 0xFF) as u8;
     let b4 = (h & 0xFF) as u8;
-    // 239.255.x.y
+    // 239.255.x.y (Local scope multicast)
     let ip = format!("239.255.{}.{}", b3, b4);
     
-    // Port 8000 + (h % 4096)
-    let port = 8000 + (h % 4096) as u16;
+    // Port 8000 + (h % 30000)
+    let port = 8000 + (h % 30000) as u16;
     
     (ip, port)
+}
+
+fn get_local_interfaces() -> Vec<std::net::Ipv4Addr> {
+    let mut interfaces = Vec::new();
+    if let Ok(addrs) = ipconfig::get_adapters() {
+        for adapter in addrs {
+            for ip in adapter.ip_addresses() {
+                if let std::net::IpAddr::V4(ipv4) = ip {
+                    if !ipv4.is_loopback() && !ipv4.is_link_local() {
+                        interfaces.push(*ipv4);
+                    }
+                }
+            }
+        }
+    }
+    if interfaces.is_empty() {
+        interfaces.push(std::net::Ipv4Addr::new(0, 0, 0, 0));
+    }
+    interfaces
 }
 
 pub struct AudioSender {
@@ -45,11 +64,9 @@ impl AudioSender {
     }
 
     pub fn send(&self, packet: &AudioPacket) -> Result<()> {
-        let config = bincode::config::standard();
-        let data = bincode::serde::encode_to_vec(packet, config)?;
+        let data = bincode::serialize(packet)?;
         match self.socket.send_to(&data, self.addr) {
             Ok(_) => {
-                // Her 100 pakette bir log basalım ki console dolmasın
                 if packet.sequence % 100 == 0 {
                     println!("Ağ Paket Gönderildi: seq={}, size={}", packet.sequence, data.len());
                 }
@@ -71,23 +88,22 @@ impl AudioReceiver {
         #[cfg(not(windows))]
         socket.set_reuse_port(true)?;
         
-        // Portu bind et
         let addr: SocketAddr = format!("0.0.0.0:{}", port).parse()?;
         socket.bind(&addr.into())?;
         
         let multi_addr: std::net::Ipv4Addr = multicast_ip.parse()?;
-        let interface: std::net::Ipv4Addr = "0.0.0.0".parse()?;
         
-        println!("Multicast grubuna katılım deneniyor: {} port: {}", multicast_ip, port);
+        // Tüm yerel arayüzlerden gruba katıl
+        let interfaces = get_local_interfaces();
+        println!("Multicast Dinleyici: {} arayüz üzerinden {} grubuna katılıyor...", interfaces.len(), multicast_ip);
         
-        // Multicast katılımı
-        if let Err(e) = socket.join_multicast_v4(&multi_addr, &interface) {
-            eprintln!("Multicast katılım hatası (0.0.0.0): {}", e);
-        } else {
-            println!("Multicast grubuna başarıyla katıldık: {}", multicast_ip);
+        for iface in interfaces {
+            if let Err(e) = socket.join_multicast_v4(&multi_addr, &iface) {
+                eprintln!("Arayüz ({}) üzerinden multicast katılım hatası: {}", iface, e);
+            }
         }
         
-        let _ = socket.set_recv_buffer_size(1024 * 1024);
+        let _ = socket.set_recv_buffer_size(2 * 1024 * 1024);
         socket.set_nonblocking(true)?;
 
         Ok(Self { socket: socket.into() })
@@ -103,8 +119,7 @@ impl AudioReceiver {
                 received_any = true;
                 // println!("Veri alınıyor... Kaynak: {}, Boyut: {}", src, n);
             }
-            let config = bincode::config::standard();
-            if let Ok((packet, _)) = bincode::serde::decode_from_slice::<AudioPacket, _>(&buf[..n], config) {
+            if let Ok(packet) = bincode::deserialize::<AudioPacket>(&buf[..n]) {
                 if packet.sequence % 100 == 0 {
                     println!("Ağ Paket Alındı: seq={}, from={}", packet.sequence, src);
                 }
@@ -147,35 +162,43 @@ impl DiscoveryService {
 
     pub fn broadcast_announce(&self, info: StreamInfo) -> Result<()> {
         let msg = MessageType::Announce(info);
-        let config = bincode::config::standard();
-        let data = bincode::serde::encode_to_vec(&msg, config)?;
+        let data = bincode::serialize(&msg)?;
         
-        // Hem broadcast hem multicast gönderiyoruz ki her türlü ağ yapısında ulaşsın
         let broadcast_addr: SocketAddr = "255.255.255.255:11111".parse()?;
         let multicast_addr: SocketAddr = "239.1.1.1:11111".parse()?;
         
-        let _ = self.socket.send_to(&data, broadcast_addr);
-        let _ = self.socket.send_to(&data, multicast_addr);
+        // Windows'ta paketlerin doğru karttan dışarı çıkması için her arayüzden tek tek fırlatıyoruz
+        for iface in get_local_interfaces() {
+            if let Ok(sender) = UdpSocket::bind(format!("{}:0", iface)) {
+                let _ = sender.set_broadcast(true);
+                let _ = sender.send_to(&data, broadcast_addr);
+                let _ = sender.send_to(&data, multicast_addr);
+            }
+        }
+        
         Ok(())
     }
 
     pub fn broadcast_heartbeat(&self, info: StreamInfo) -> Result<()> {
         let msg = MessageType::Heartbeat(info);
-        let config = bincode::config::standard();
-        let data = bincode::serde::encode_to_vec(&msg, config)?;
+        let data = bincode::serialize(&msg)?;
         
         let broadcast_addr: SocketAddr = "255.255.255.255:11111".parse()?;
         let multicast_addr: SocketAddr = "239.1.1.1:11111".parse()?;
         
-        let _ = self.socket.send_to(&data, broadcast_addr);
-        let _ = self.socket.send_to(&data, multicast_addr);
+        for iface in get_local_interfaces() {
+            if let Ok(sender) = UdpSocket::bind(format!("{}:0", iface)) {
+                let _ = sender.set_broadcast(true);
+                let _ = sender.send_to(&data, broadcast_addr);
+                let _ = sender.send_to(&data, multicast_addr);
+            }
+        }
         Ok(())
     }
 
     pub fn broadcast_goodbye(&self, user_id: String) -> Result<()> {
         let msg = MessageType::Goodbye(user_id);
-        let config = bincode::config::standard();
-        let data = bincode::serde::encode_to_vec(&msg, config)?;
+        let data = bincode::serialize(&msg)?;
         
         let broadcast_addr: SocketAddr = "255.255.255.255:11111".parse()?;
         let multicast_addr: SocketAddr = "239.1.1.1:11111".parse()?;
@@ -188,8 +211,7 @@ impl DiscoveryService {
     pub fn update(&self) -> Result<()> {
         let mut buf = [0u8; 1024];
         while let Ok((n, _)) = self.socket.recv_from(&mut buf) {
-            let config = bincode::config::standard();
-            if let Ok((msg, _)) = bincode::serde::decode_from_slice::<MessageType, _>(&buf[..n], config) {
+            if let Ok(msg) = bincode::deserialize::<MessageType>(&buf[..n]) {
                 let mut peers = self.peers.lock().unwrap();
                 match msg {
                     MessageType::Announce(info) | MessageType::Heartbeat(info) => {

@@ -232,7 +232,7 @@ impl PlaybackEngine {
                 };
 
                 let mut is_prebuffering = true;
-                let prebuffer_threshold = (sample_rate / 1000 * FRAME_SIZE_MS * 3 * channels as u32) as usize;
+                let prebuffer_threshold = (sample_rate / 1000 * FRAME_SIZE_MS * 8 * channels as u32) as usize;
 
                 let stream = device.build_output_stream(
                     &config,
