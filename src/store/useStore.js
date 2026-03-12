@@ -92,6 +92,7 @@ export const useStore = create((set, get) => ({
 
   startBroadcast: async (deviceName) => {
     const { userId, userName } = get();
+    console.log('Starting broadcast:', { deviceName, userId, userName });
     try {
       await invoke('start_broadcast', { deviceName, userId, userName });
       set({ isStreaming: true });

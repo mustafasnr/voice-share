@@ -47,7 +47,15 @@ impl AudioSender {
     pub fn send(&self, packet: &AudioPacket) -> Result<()> {
         let config = bincode::config::standard();
         let data = bincode::serde::encode_to_vec(packet, config)?;
-        self.socket.send_to(&data, self.addr)?;
+        match self.socket.send_to(&data, self.addr) {
+            Ok(_) => {
+                // Her 100 pakette bir log basalım ki console dolmasın
+                if packet.sequence % 100 == 0 {
+                    println!("Ağ Paket Gönderildi: seq={}, size={}", packet.sequence, data.len());
+                }
+            }
+            Err(e) => eprintln!("Ağ Gönderim Hatası: {}", e),
+        }
         Ok(())
     }
 }
@@ -63,16 +71,23 @@ impl AudioReceiver {
         #[cfg(not(windows))]
         socket.set_reuse_port(true)?;
         
+        // Portu bind et
         let addr: SocketAddr = format!("0.0.0.0:{}", port).parse()?;
         socket.bind(&addr.into())?;
         
         let multi_addr: std::net::Ipv4Addr = multicast_ip.parse()?;
         let interface: std::net::Ipv4Addr = "0.0.0.0".parse()?;
-        socket.join_multicast_v4(&multi_addr, &interface).map_err(|e| anyhow::anyhow!("Multicast join error: {}", e))?;
         
-        // Windows için receive buffer'ı 2MB yapalım, paket düşmesini engeller
-        let _ = socket.set_recv_buffer_size(2 * 1024 * 1024);
+        println!("Multicast grubuna katılım deneniyor: {} port: {}", multicast_ip, port);
         
+        // Multicast katılımı
+        if let Err(e) = socket.join_multicast_v4(&multi_addr, &interface) {
+            eprintln!("Multicast katılım hatası (0.0.0.0): {}", e);
+        } else {
+            println!("Multicast grubuna başarıyla katıldık: {}", multicast_ip);
+        }
+        
+        let _ = socket.set_recv_buffer_size(1024 * 1024);
         socket.set_nonblocking(true)?;
 
         Ok(Self { socket: socket.into() })
@@ -83,14 +98,16 @@ impl AudioReceiver {
         let mut buf = [0u8; 65507];
         let mut received_any = false;
         
-        while let Ok((n, _)) = self.socket.recv_from(&mut buf) {
+        while let Ok((n, src)) = self.socket.recv_from(&mut buf) {
             if !received_any {
                 received_any = true;
-                // İlk paket geldiğinde debug için yazalım
-                // println!("Veri alınıyor... Paket boyutu: {}", n);
+                // println!("Veri alınıyor... Kaynak: {}, Boyut: {}", src, n);
             }
             let config = bincode::config::standard();
             if let Ok((packet, _)) = bincode::serde::decode_from_slice::<AudioPacket, _>(&buf[..n], config) {
+                if packet.sequence % 100 == 0 {
+                    println!("Ağ Paket Alındı: seq={}, from={}", packet.sequence, src);
+                }
                 packets.push(packet);
             }
         }
@@ -114,6 +131,12 @@ impl DiscoveryService {
         let addr: SocketAddr = "0.0.0.0:11111".parse()?;
         socket.bind(&addr.into())?;
         socket.set_broadcast(true)?;
+        
+        // Multicast grubuna katıl (Keşif için ek güvence)
+        let multi_addr: std::net::Ipv4Addr = "239.1.1.1".parse()?;
+        let interface: std::net::Ipv4Addr = "0.0.0.0".parse()?;
+        let _ = socket.join_multicast_v4(&multi_addr, &interface);
+
         socket.set_nonblocking(true)?;
 
         Ok(Self {
@@ -126,8 +149,13 @@ impl DiscoveryService {
         let msg = MessageType::Announce(info);
         let config = bincode::config::standard();
         let data = bincode::serde::encode_to_vec(&msg, config)?;
-        let addr: SocketAddr = "255.255.255.255:11111".parse()?;
-        self.socket.send_to(&data, addr)?;
+        
+        // Hem broadcast hem multicast gönderiyoruz ki her türlü ağ yapısında ulaşsın
+        let broadcast_addr: SocketAddr = "255.255.255.255:11111".parse()?;
+        let multicast_addr: SocketAddr = "239.1.1.1:11111".parse()?;
+        
+        let _ = self.socket.send_to(&data, broadcast_addr);
+        let _ = self.socket.send_to(&data, multicast_addr);
         Ok(())
     }
 
@@ -135,8 +163,12 @@ impl DiscoveryService {
         let msg = MessageType::Heartbeat(info);
         let config = bincode::config::standard();
         let data = bincode::serde::encode_to_vec(&msg, config)?;
-        let addr: SocketAddr = "255.255.255.255:11111".parse()?;
-        self.socket.send_to(&data, addr)?;
+        
+        let broadcast_addr: SocketAddr = "255.255.255.255:11111".parse()?;
+        let multicast_addr: SocketAddr = "239.1.1.1:11111".parse()?;
+        
+        let _ = self.socket.send_to(&data, broadcast_addr);
+        let _ = self.socket.send_to(&data, multicast_addr);
         Ok(())
     }
 
@@ -144,8 +176,12 @@ impl DiscoveryService {
         let msg = MessageType::Goodbye(user_id);
         let config = bincode::config::standard();
         let data = bincode::serde::encode_to_vec(&msg, config)?;
-        let addr: SocketAddr = "255.255.255.255:11111".parse()?;
-        self.socket.send_to(&data, addr)?;
+        
+        let broadcast_addr: SocketAddr = "255.255.255.255:11111".parse()?;
+        let multicast_addr: SocketAddr = "239.1.1.1:11111".parse()?;
+        
+        let _ = self.socket.send_to(&data, broadcast_addr);
+        let _ = self.socket.send_to(&data, multicast_addr);
         Ok(())
     }
 

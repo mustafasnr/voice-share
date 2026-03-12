@@ -239,19 +239,23 @@ impl PlaybackEngine {
                     move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
                         let vol = *volume.lock().unwrap();
                         let mut consumer = consumer.lock().unwrap();
+                        let available = (*consumer).occupied_len();
                         
                         if is_prebuffering {
-                        if (*consumer).occupied_len() >= prebuffer_threshold {
+                            if available >= prebuffer_threshold {
+                                println!("Oynatma başlıyor... (Buffer: {})", available);
                                 is_prebuffering = false;
                             } else {
-                                // Tampon dolana kadar sessizlik bas
                                 data.fill(0.0);
                                 return;
                             }
                         }
 
-                        if consumer.is_empty() {
+                        if available == 0 {
+                            // Sadece bir kez bassın diye burayı silent yapabiliriz veya prebuffering'e dönebiliriz
                             is_prebuffering = true;
+                            data.fill(0.0);
+                            return;
                         }
 
                         for sample in data.iter_mut() {

@@ -76,17 +76,19 @@ fn start_broadcast(
     let mut lock = state.capture.lock().unwrap();
     *lock = Some(capture);
 
-    // Determine if the source is an output (monitor) or input (mic)
+    // Determine if the source is an output (monitor) or input (mic) and get friendly name
     let devices = audio::get_all_capture_devices().unwrap_or_default();
-    let is_output = devices.iter()
-        .find(|d| d.id == device_name)
-        .map(|d| d.is_output)
-        .unwrap_or(false);
+    let device_info = devices.iter().find(|d| d.id == device_name);
+    
+    let is_output = device_info.map(|d| d.is_output).unwrap_or(false);
+    let friendly_name = device_info.map(|d| d.name.clone()).unwrap_or_else(|| device_name.clone());
+
+    println!("Yayın bilgileri hazırlanıyor: Kullanıcı: {}, Cihaz: {}, Multicast: {}:{}", user_name, friendly_name, ip, port);
 
     let info = StreamInfo {
         user_id: user_id.clone(),
         user_name,
-        device_name,
+        device_name: friendly_name,
         is_output,
         multicast_ip: ip,
         port,
